@@ -2,60 +2,50 @@
 
 **Watch on AnimeKai. Let Discord handle the rest.**
 
-AnimeKai RPC is a small Windows + browser project that automatically shows what you're watching on AnimeKai as Discord Rich Presence.
+AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Rich Presence. Once the browser extension and Windows helper are installed, you can open an episode and just watch — the title, episode, playback state, timer, and artwork update in Discord for you.
 
 **Made by viesca27**
 
 ---
 
-## What does it do?
+## V6 is now the official release
 
-Once everything is installed, you can just open AnimeKai and start watching. AnimeKai RPC handles the Discord presence in the background.
+AnimeKai RPC **V6.0.0** is the current stable version.
 
-It can show:
+V6 rolls together everything that was tested across the V6 alpha builds while keeping the playback/RPC path that proved reliable in V5.
 
-- anime title
-- current episode and total episodes
-- playing, paused, and buffering status
-- elapsed / remaining watch time
-- cover artwork
-- a button back to AnimeKai
+What you get in V6:
 
-There is no need to manually change your Discord status every episode.
-
-## Current versions
-
-### V5 — Stable
-
-V5 is the version to use if you just want AnimeKai RPC working right now. It uses the stable playback detection and local Discord RPC setup that the project was built around.
-
-### V6 Alpha 5 — Testing
-
-V6 Alpha 5 is the current test build in [`src/v6`](src/v6).
-
-The goal of V6 is to make AnimeKai RPC feel like a normal app that someone can install without needing to know how Native Messaging or Discord Rich Presence works.
-
-Alpha 5 currently includes:
-
-- built-in Discord Application ID — no Discord developer setup required
-- first-run setup guide
-- optional embedded-player permission instead of requiring broad site access at install time
-- helper install/update status directly in the popup
+- automatic AnimeKai title and episode detection
+- play, pause, buffering, and timestamp tracking
+- Discord Rich Presence with the public AnimeKai RPC application already configured
+- a small Windows desktop helper for Discord communication
+- **Refresh** / reconnect controls
 - one-click **Repair App**
-- custom accent, popup background, and card colors
-- six built-in themes: **AnimeKai, Borealis, Charcoal, Midnight, Sakura, and Ember**
-- better cover-art recovery and local caching
-- no generic backup image when a cover fails
-- clearer diagnostics and error messages
-- the V5-style browser extension icon
+- first-run setup and helper-version checks
+- optional embedded-player access instead of requiring broad site access during install
+- alternate cover-art recovery through Jikan with local caching
+- the familiar V5 browser-extension icon
+- appearance customization with custom colors and gradient presets
 
-V6 is still a prerelease, so V5 remains the recommended stable download while Alpha 5 is tested.
+### Gradient appearance presets
 
-You can follow development in the [V6 roadmap](docs/V6_ROADMAP.md).
+V6 includes six built-in gradient themes:
 
-## How does it work?
+- **AnimeKai Aurora** — the purple default
+- **Borealis** — teal / aqua
+- **Charcoal** — dark neutral gray
+- **Midnight** — deep navy / blue
+- **Sakura** — plum / pink
+- **Ember** — brown / orange
 
-AnimeKai RPC is made of two parts:
+You can also choose your own accent, popup background, and card colors. Custom color choices are saved locally.
+
+## What happened to V5?
+
+V5 is still available in Releases as the legacy stable build and a useful fallback if somebody runs into a V6-specific issue. New installs should use V6.
+
+## How it works
 
 ```text
 AnimeKai in your browser
@@ -67,98 +57,80 @@ Local Windows helper
 Discord Rich Presence
 ```
 
-The browser extension detects the anime and playback state. The Windows helper then talks to the Discord desktop app.
+The extension handles AnimeKai detection. The Windows helper handles the local connection to the Discord desktop app. Discord credentials are not required, and the Rich Presence connection does not need a cloud server.
 
-The helper is necessary because Chromium extensions cannot directly access Discord's local IPC connection. The Rich Presence itself does **not** require a cloud server.
+## Installing V6
 
-## V6 setup
+1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.0.0-Windows.zip**.
+2. Extract the ZIP somewhere permanent.
+3. Run **Install AnimeKai RPC.cmd**.
+4. Load the included `extension` folder in your Chromium-based browser while browser-store publishing is being finalized.
+5. Open the V6 setup guide and enable **Player detection** when prompted.
+6. Open AnimeKai, start an episode, and press **Refresh** once if Discord does not appear immediately.
 
-V6 automatically includes the project's public Discord Application ID, so users do not need to create their own Discord application.
+The Discord Application ID is already built in. You do **not** need to create a Discord application or paste an ID anywhere.
 
-AnimeKai sometimes loads video inside third-party frames. V6 asks for that broader player access only when the user chooses **Enable player detection** in the setup guide or popup. The extension's player detector checks that the frame belongs to an AnimeKai page before doing anything.
+## Why does Player detection ask for optional site access?
 
-The Windows helper is still required. The popup tells you if it is missing or on an older version and links directly to the matching V6 release.
+AnimeKai can load its video player from changing third-party domains. V6 keeps broad cross-origin frame access out of the extension's required install permissions and asks for it only when you explicitly enable **Player detection**.
+
+That permission is used to detect playback inside AnimeKai's embedded player frames. The detector checks whether a frame is part of an AnimeKai page and exits when it is not.
 
 ## Repair App
 
-Instead of making users dig through folders or registry entries, **Repair App** checks things like:
+If the connection gets weird, **Repair App** is meant to be the first thing you try.
 
-- desktop helper installation
-- Native Messaging manifest
-- Opera / Chrome / Edge registration
-- extension-to-helper connection
-- Discord RPC connection
-- local configuration
-
-If something can be safely fixed automatically, the app fixes it and explains what happened. Personal themes and settings are kept during a normal repair.
+It checks the desktop helper, Native Messaging manifest, Chrome / Chromium / Edge registry entries, local configuration, and Discord RPC connection. Normal repairs preserve your personal appearance settings and RPC preferences.
 
 ## Better cover artwork
 
-V6 first tries to use the cover provided by AnimeKai.
+V6 uses the cover from AnimeKai when possible. If that cover is missing or rejected by Discord, the extension can search Jikan for another matching anime poster, cache the result locally, and resend the Rich Presence.
 
-If that image is missing or broken, the extension can look for another matching anime poster from an anime metadata provider and cache the result locally. The goal is to keep a real anime cover in Discord instead of falling back to a generic placeholder.
+If no usable image is available, the RPC can fall back to a clean text-only presence instead of showing a random generic image.
 
-## Customization
+## Desktop helper
 
-Alpha 5 expands the Appearance section quite a bit. You can change the accent color, the main popup background, and the card/background panels independently.
+V6.0.0 includes an updated stable helper with:
 
-If you do not feel like building a theme from scratch, there are premade presets:
+- the bundled AnimeKai RPC Discord Application ID
+- clearer connection errors
+- a second Discord connection attempt before reporting failure
+- stable helper/version reporting to the extension
+- improved health-check information
+- repair support for Native Messaging registration
+- an `install-info.json` record for easier troubleshooting
+- upgrade behavior that preserves existing V5/V6 RPC preferences
 
-- **AnimeKai** — the default purple look
-- **Borealis** — dark teal with a mint accent
-- **Charcoal** — neutral gray
-- **Midnight** — deep navy / blue
-- **Sakura** — dark pink / plum
-- **Ember** — warm brown / orange
+The helper installs under `%LOCALAPPDATA%\AnimeKaiRPC` and starts automatically when the extension connects to it. It does not need to sit open as a separate server window all day.
 
-The dark, light, and system text modes are still available, along with compact layout and reduced motion. Custom colors are saved locally so they stay put when you close the browser or repair/reinstall the helper.
+## Browser-store progress
 
-Theme import/export is planned for a later V6 build.
+V6 is structured for Chrome Web Store and Microsoft Edge Add-ons distribution. The remaining store work is mainly publishing/configuration: final production extension IDs, helper allowlisting for those IDs, store artwork/screenshots, and final review of the privacy disclosure.
 
-## Installation
+Until the store listings are live, the GitHub V6 package uses the unpacked extension flow.
 
-### Stable V5
+## Found a bug or have an idea?
 
-Use the latest stable GitHub Release if you want the most proven build.
+Use the GitHub issue forms:
 
-### V6 testing
+- [Report a bug](https://github.com/viesca272/AnimeKai-RPC/issues/new/choose)
+- [Request a feature](https://github.com/viesca272/AnimeKai-RPC/issues/new/choose)
 
-Download the newest V6 prerelease Windows ZIP, extract it, run **Install AnimeKai RPC.cmd**, then load the included `extension` folder as an unpacked extension while V6 is still in testing.
-
-On a fresh V6 install, the extension opens a setup page that walks through player access and the desktop helper.
-
-V6 is being prepared for browser-store distribution so normal users will eventually be able to install the extension without **Developer mode → Load unpacked**.
-
-## Found a bug?
-
-Open a [bug report](https://github.com/viesca272/AnimeKai-RPC/issues/new/choose).
-
-If AnimeKai RPC is running, use **Copy diagnostics** and include that information in the report. It makes connection and playback problems much easier to figure out.
-
-## Have an idea for V6?
-
-Feature suggestions are welcome.
-
-Open a [feature request](https://github.com/viesca272/AnimeKai-RPC/issues/new/choose) and describe what you would like to see. Small quality-of-life improvements are especially useful because V6 is focused heavily on making the app easier to use.
+If you're reporting a connection problem, use **Copy diagnostics** in the extension and include the result. It makes troubleshooting much faster.
 
 ## Privacy
 
-AnimeKai RPC is designed around local playback detection and local Discord Rich Presence.
+AnimeKai RPC does **not** need your Discord password, Discord user token, bot token, or client secret.
 
-It does **not** need your:
+The Discord Application ID included with the project is a public identifier used for Rich Presence. Local settings are stored on your machine/browser. V6 may contact Jikan when it needs to find replacement anime artwork.
 
-- Discord password
-- Discord user token
-- bot token
-- client secret
-
-The Discord Application ID used for Rich Presence is a public identifier and is included in V6 so users do not have to configure one themselves.
-
-See the project's [privacy page](privacy.html) for more information.
+See [privacy.html](privacy.html) for the current privacy information.
 
 ## Project website
 
-The GitHub Pages site included in this repository contains installation help, V6 previews, troubleshooting, privacy information, and the changelog.
+The project site contains install help, troubleshooting, changelog notes, and V6 information:
+
+https://viesca272.github.io/AnimeKai-RPC/
 
 ## License
 
@@ -166,6 +138,6 @@ See [LICENSE](LICENSE).
 
 ---
 
-Thanks for checking out AnimeKai RPC.
+Thanks for using AnimeKai RPC.
 
 **Made by viesca27**
