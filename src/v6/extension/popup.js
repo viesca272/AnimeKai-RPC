@@ -1,19 +1,70 @@
 const $ = id => document.getElementById(id);
 let lastState = null;
 
+const PRESETS = {
+  animekai: {name:"AnimeKai", accent:"#8b5cf6", background:"#0c0b12", cardBackground:"#16131d", theme:"dark"},
+  borealis: {name:"Borealis", accent:"#5eead4", background:"#07171a", cardBackground:"#0d2629", theme:"dark"},
+  charcoal: {name:"Charcoal", accent:"#b4b4b8", background:"#101113", cardBackground:"#1b1d20", theme:"dark"},
+  midnight: {name:"Midnight", accent:"#60a5fa", background:"#070b18", cardBackground:"#10182c", theme:"dark"},
+  sakura: {name:"Sakura", accent:"#f472b6", background:"#190d16", cardBackground:"#2a1424", theme:"dark"},
+  ember: {name:"Ember", accent:"#fb923c", background:"#1a0f09", cardBackground:"#2a1810", theme:"dark"}
+};
+
 const fmt = seconds => {
   const s = Math.max(0, Math.floor(seconds || 0));
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 };
 
+const validHex = value => /^#[0-9a-f]{6}$/i.test(String(value || ""));
+
+function setCss(name, value) {
+  document.documentElement.style.setProperty(name, value);
+}
+
+function resolvedTheme(theme) {
+  if (theme !== "system") return theme;
+  return matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
+function applyTextMode(theme) {
+  const light = resolvedTheme(theme) === "light";
+  document.documentElement.style.colorScheme = light ? "light" : "dark";
+  setCss("--text", light ? "#17131d" : "#f6f2ff");
+  setCss("--muted", light ? "#675f70" : "#a8a0b4");
+  setCss("--border", light ? "rgba(45,35,55,.24)" : "rgba(170,150,195,.20)");
+  setCss("--button", light ? "rgba(255,255,255,.42)" : "rgba(255,255,255,.075)");
+  setCss("--field", light ? "rgba(255,255,255,.58)" : "rgba(0,0,0,.20)");
+  setCss("--cover", light ? "rgba(30,20,40,.10)" : "rgba(255,255,255,.08)");
+  setCss("--bar", light ? "rgba(30,20,40,.14)" : "rgba(255,255,255,.11)");
+}
+
 function applyTheme(s) {
-  const accent = s?.settings?.accent || "#8b5cf6";
-  document.documentElement.style.setProperty("--accent", accent);
+  const settings = s?.settings || {};
+  const accent = validHex(settings.accent) ? settings.accent : PRESETS.animekai.accent;
+  const background = validHex(settings.background) ? settings.background : PRESETS.animekai.background;
+  const cardBackground = validHex(settings.cardBackground) ? settings.cardBackground : PRESETS.animekai.cardBackground;
+  const theme = settings.theme || "dark";
+  const preset = settings.preset || "animekai";
+
+  setCss("--accent", accent);
+  setCss("--bg", background);
+  setCss("--card", cardBackground);
+  applyTextMode(theme);
+
   $("accent").value = accent;
   $("hex").value = accent;
-  $("theme").value = s?.settings?.theme || "dark";
-  $("compact").checked = !!s?.settings?.compact;
-  $("reduced").checked = !!s?.settings?.reducedMotion;
+  $("background").value = background;
+  $("bgHex").value = background;
+  $("cardColor").value = cardBackground;
+  $("cardHex").value = cardBackground;
+  $("theme").value = theme;
+  $("compact").checked = !!settings.compact;
+  $("reduced").checked = !!settings.reducedMotion;
+
+  document.querySelectorAll(".preset").forEach(button => {
+    button.classList.toggle("active", button.dataset.preset === preset);
+  });
+  $("presetName").textContent = PRESETS[preset]?.name || "Custom";
 }
 
 function renderSetup(s) {
@@ -94,16 +145,38 @@ function getState() {
   chrome.runtime.sendMessage({type:"getState"}, r => { if (r) render(r); });
 }
 
-function saveAppearance() {
-  const accent = /^#[0-9a-f]{6}$/i.test($("hex").value) ? $("hex").value : $("accent").value;
+function currentAppearance(preset = "custom") {
+  const accent = validHex($("hex").value) ? $("hex").value : $("accent").value;
+  const background = validHex($("bgHex").value) ? $("bgHex").value : $("background").value;
+  const cardBackground = validHex($("cardHex").value) ? $("cardHex").value : $("cardColor").value;
+  return {
+    accent,
+    background,
+    cardBackground,
+    preset,
+    theme:$("theme").value,
+    compact:$("compact").checked,
+    reducedMotion:$("reduced").checked
+  };
+}
+
+function saveAppearance(preset = "custom") {
+  chrome.runtime.sendMessage({type:"setSettings", settings:currentAppearance(preset)}, getState);
+}
+
+function applyPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  $("accent").value = p.accent;
+  $("hex").value = p.accent;
+  $("background").value = p.background;
+  $("bgHex").value = p.background;
+  $("cardColor").value = p.cardBackground;
+  $("cardHex").value = p.cardBackground;
+  $("theme").value = p.theme;
   chrome.runtime.sendMessage({
     type:"setSettings",
-    settings:{
-      accent,
-      theme:$("theme").value,
-      compact:$("compact").checked,
-      reducedMotion:$("reduced").checked
-    }
+    settings:{...p, preset:key, compact:$("compact").checked, reducedMotion:$("reduced").checked}
   }, getState);
 }
 
@@ -140,14 +213,20 @@ async function enablePlayerAccess() {
 }
 
 function openSetupRelease() {
-  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.4"});
+  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.5"});
 }
 
 $("accent").oninput = e => { $("hex").value = e.target.value; saveAppearance(); };
-$("hex").onchange = saveAppearance;
-$("theme").onchange = saveAppearance;
-$("compact").onchange = saveAppearance;
-$("reduced").onchange = saveAppearance;
+$("hex").onchange = () => saveAppearance();
+$("background").oninput = e => { $("bgHex").value = e.target.value; saveAppearance(); };
+$("bgHex").onchange = () => saveAppearance();
+$("cardColor").oninput = e => { $("cardHex").value = e.target.value; saveAppearance(); };
+$("cardHex").onchange = () => saveAppearance();
+$("theme").onchange = () => saveAppearance();
+$("compact").onchange = () => saveAppearance(lastState?.settings?.preset || "custom");
+$("reduced").onchange = () => saveAppearance(lastState?.settings?.preset || "custom");
+$("resetTheme").onclick = () => applyPreset("animekai");
+document.querySelectorAll(".preset").forEach(button => button.onclick = () => applyPreset(button.dataset.preset));
 $("refresh").onclick = refresh;
 $("playerAccess").onclick = enablePlayerAccess;
 $("helper").onclick = openSetupRelease;
@@ -167,6 +246,9 @@ $("copy").onclick = () => chrome.runtime.sendMessage({type:"copyDiagnostics"}, a
   setTimeout(() => $("copy").textContent = "Copy diagnostics", 1200);
 });
 
+matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => {
+  if ((lastState?.settings?.theme || "dark") === "system") applyTheme(lastState);
+});
 chrome.runtime.onMessage.addListener(m => { if (m.type === "v6State") render(m.state); });
 getState();
 setInterval(getState, 1500);
