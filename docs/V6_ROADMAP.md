@@ -6,6 +6,8 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 
 - [x] Preserve stable playback detection
 - [x] Add appearance customization foundation
+- [x] Add custom accent/background/card colors
+- [x] Add built-in appearance presets (AnimeKai, Borealis, Charcoal, Midnight, Sakura, Ember)
 - [x] Add Repair App request + native helper repair routine
 - [x] Add alternate cover-art resolver and cache
 - [x] Remove dependence on a generic fallback artwork asset
@@ -14,6 +16,8 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [x] Restore V5-style extension artwork
 - [x] Add first-run onboarding
 - [x] Add helper install/update status in the popup
+- [ ] Add theme import/export
+- [ ] Finish compact-layout polish
 - [ ] Test upgrade from V5 on multiple Windows installs
 - [ ] Finish plain-English errors for every common failure
 
