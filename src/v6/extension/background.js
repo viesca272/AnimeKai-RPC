@@ -1,8 +1,8 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0-alpha.4";
+const VERSION = "6.0.0-alpha.5";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.4";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.5";
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
@@ -11,6 +11,9 @@ const DEFAULTS = {
   detailsTemplate: "{anime}",
   stateTemplate: "Episode {episode} / {total} • {status}",
   accent: "#8b5cf6",
+  background: "#0c0b12",
+  cardBackground: "#16131d",
+  preset: "animekai",
   theme: "dark",
   compact: false,
   reducedMotion: false
@@ -296,6 +299,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       `AnimeKai RPC ${VERSION}`, `Made by viesca27`,
       `Discord application: Bundled`,
       `Player access: ${state.playerAccess?"Enabled":"Limited"}`,
+      `Appearance preset: ${settings.preset || "custom"}`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
       `Discord RPC: ${state.discordConnected?"Connected":"Not connected"}`,
