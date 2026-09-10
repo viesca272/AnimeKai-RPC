@@ -1,5 +1,5 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0-alpha.1";
+const VERSION = "6.0.0-alpha.2";
 const DEFAULTS = {
   enabled: true,
   client_id: "",
@@ -30,6 +30,7 @@ const state = {
   rpcVariant: null,
   rpcLastUpdate: null,
   lastUpdate: null,
+  lastRefresh: null,
   lastError: null,
   current: null,
   repair: null,
@@ -117,6 +118,27 @@ function sendNative(message) {
   if (!connectNative()) return false;
   try { port.postMessage(message); return true; }
   catch (e) { state.lastError = e.message; return false; }
+}
+
+async function refreshNow() {
+  state.lastRefresh = Date.now();
+  state.lastError = null;
+  connectNative();
+
+  if (settings.client_id) sendNative({type:"config", config:nativeConfig()});
+  sendNative({type:"refresh"});
+
+  try {
+    const tabs = await chrome.tabs.query({url:["https://animekai.be/*", "https://www.animekai.be/*"]});
+    await Promise.allSettled(tabs.map(tab => tab.id != null
+      ? chrome.tabs.sendMessage(tab.id, {type:"forceRefresh"})
+      : Promise.resolve()));
+  } catch {}
+
+  lastActivitySig = "";
+  lastActivitySentAt = 0;
+  if (current && settings.enabled) sendActivity(true);
+  broadcast();
 }
 
 function scoreMedia(m) {
@@ -221,6 +243,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendNative({type:"config", config:nativeConfig()});
     sendActivity(true); broadcast(); sendResponse({ok:true}); return true;
   }
+  if (msg.type === "refresh") { refreshNow().then(()=>sendResponse({ok:true})).catch(e=>sendResponse({ok:false,error:e.message})); return true; }
   if (msg.type === "test") { sendNative({type:"test", settings:nativeConfig()}); sendResponse({ok:true}); return true; }
   if (msg.type === "clear") { current=null; sendNative({type:"clear"}); broadcast(); sendResponse({ok:true}); return true; }
   if (msg.type === "coverFailed") { resolveAlternateCover(msg.title, msg.url, true); sendResponse({ok:true}); return true; }
@@ -230,6 +253,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const d = current;
     sendResponse({text:[
       `AnimeKai RPC ${VERSION}`, `Made by viesca27`,
+      `Application ID: ${settings.client_id?"Configured":"Missing"}`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
       `Discord RPC: ${state.discordConnected?"Connected":"Not connected"}`,
