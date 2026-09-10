@@ -10,7 +10,9 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.0.0-alpha.5"
+HOST_VERSION = "6.0.0"
+HELPER_CHANNEL = "stable"
+PROTOCOL_VERSION = 2
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 PUBLISHER_CLIENT_ID = "1543575455523807385"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
@@ -18,6 +20,7 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
 LOG_FILE = APP_DIR / "native_host.log"
 MANIFEST_FILE = APP_DIR / f"{HOST_NAME}.json"
+INSTALL_INFO_FILE = APP_DIR / "install-info.json"
 DEFAULTS = {
     "client_id": PUBLISHER_CLIENT_ID,
     "playbackMode": "auto",
@@ -77,14 +80,28 @@ def send(o):
     sys.stdout.buffer.flush()
 
 
+def friendly_error(value):
+    text = str(value or "").strip()
+    low = text.lower()
+    if not text:
+        return None
+    if "discord" in low and ("not found" in low or "no such file" in low or "pipe" in low):
+        return "Discord desktop does not appear to be running. Open Discord, then press Refresh."
+    if "connection refused" in low or "winerror 2" in low:
+        return "Could not connect to Discord desktop. Make sure Discord is open, then press Refresh."
+    return text
+
+
 def status(error=None):
     send({
         "type": "status",
         "discordConnected": discord_connected,
         "hostVersion": HOST_VERSION,
+        "helperChannel": HELPER_CHANNEL,
+        "protocolVersion": PROTOCOL_VERSION,
         "clientId": cfg().get("client_id", "") or PUBLISHER_CLIENT_ID,
-        "lastError": last_error,
-        "error": error,
+        "lastError": friendly_error(last_error),
+        "error": friendly_error(error),
         "rpcVariant": last_variant,
         "rpcLastUpdate": last_rpc_update,
         "artworkRejected": artwork_rejected,
@@ -94,7 +111,7 @@ def status(error=None):
 def ensure_rpc():
     global rpc, discord_connected, last_error
     if Presence is None:
-        last_error = "pypresence import failed: " + str(IMPORT_ERROR)
+        last_error = "Desktop helper could not load its Discord RPC library: " + str(IMPORT_ERROR)
         discord_connected = False
         return False
     cid = str(cfg().get("client_id") or PUBLISHER_CLIENT_ID).strip()
@@ -104,19 +121,26 @@ def ensure_rpc():
         return False
     if rpc and discord_connected:
         return True
-    try:
-        rpc = Presence(cid)
-        rpc.connect()
-        discord_connected = True
-        last_error = None
-        log("Discord RPC connected")
-        return True
-    except Exception as e:
-        rpc = None
-        discord_connected = False
-        last_error = str(e)
-        log("Discord connect failed: " + repr(e))
-        return False
+
+    error = None
+    for attempt in range(2):
+        try:
+            rpc = Presence(cid)
+            rpc.connect()
+            discord_connected = True
+            last_error = None
+            log(f"Discord RPC connected (attempt {attempt + 1})")
+            return True
+        except Exception as e:
+            error = e
+            rpc = None
+            discord_connected = False
+            if attempt == 0:
+                time.sleep(0.35)
+
+    last_error = friendly_error(error)
+    log("Discord connect failed: " + repr(error))
+    return False
 
 
 def close_rpc():
@@ -222,7 +246,7 @@ def activity(d, settings=None, override=None):
         status()
         return
     except Exception as e:
-        last_error = str(e)
+        last_error = friendly_error(e)
         artwork_rejected = bool(image)
         log("Dynamic RPC failed: " + repr(e))
 
@@ -235,7 +259,7 @@ def activity(d, settings=None, override=None):
         status()
         return
     except Exception as e:
-        last_error = str(e)
+        last_error = friendly_error(e)
         discord_connected = False
         log("Minimal RPC failed: " + repr(e))
         status(last_error)
@@ -282,9 +306,14 @@ def registry_locations():
 
 def health_snapshot():
     out = {
+        "version": HOST_VERSION,
+        "channel": HELPER_CHANNEL,
+        "protocol": PROTOCOL_VERSION,
         "platform": sys.platform,
         "manifest": MANIFEST_FILE.exists(),
         "executable": current_executable().exists(),
+        "config": CONFIG_FILE.exists(),
+        "install_info": INSTALL_INFO_FILE.exists(),
         "registry": {},
         "discord": discord_connected,
         "client_id": bool(str(cfg().get("client_id") or PUBLISHER_CLIENT_ID).strip()),
@@ -337,6 +366,7 @@ def repair():
 
 def main():
     global last_error
+    log(f"AnimeKai RPC helper {HOST_VERSION} ({HELPER_CHANNEL}) started")
     ensure_rpc()
     status(None if discord_connected else last_error)
 
@@ -387,9 +417,9 @@ def main():
                 ensure_rpc()
                 status(None if discord_connected else last_error)
         except Exception as e:
-            last_error = str(e)
+            last_error = friendly_error(e)
             log("Message error: " + repr(e))
-            send({"type": "error", "error": str(e)})
+            send({"type": "error", "error": last_error})
 
 
 if __name__ == "__main__":
