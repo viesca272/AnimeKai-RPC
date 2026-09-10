@@ -58,6 +58,11 @@ if(Test-Path $configFile){
 }
 $config | ConvertTo-Json | Set-Content -Path $configFile -Encoding UTF8
 
-$title = if($Repair){"AnimeKai RPC V6 repaired"}else{"AnimeKai RPC V6 helper installed"}
+$title = if($Repair){"AnimeKai RPC repaired"}else{"AnimeKai RPC helper installed"}
+$message = if($Repair){
+  "Repair finished successfully.`n`nThe Native Messaging registration and helper files were refreshed. Your personal settings were kept.`n`nReturn to the AnimeKai RPC extension and press Refresh."
+}else{
+  "The AnimeKai RPC desktop helper is installed.`n`nNo Discord Application ID setup is needed.`n`nReturn to the extension setup page and click Check again."
+}
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("$title successfully.`n`nAlpha 3 includes the AnimeKai RPC Discord application automatically, so users no longer need to enter an Application ID.`n`nExisting appearance and RPC preferences were preserved.","AnimeKai RPC V6 Alpha 3") | Out-Null
+[System.Windows.MessageBox]::Show($message,$title) | Out-Null
