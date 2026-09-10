@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement for AnimeKai RPC V6
+body:
+  - type: markdown
+    attributes:
+      value: "Got an idea that would make AnimeKai RPC nicer to use? Drop it here. Small quality-of-life ideas are welcome too."
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to add or improve?
+      description: Explain the idea in your own words.
+      placeholder: It would be nice if...
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would this be useful?
+      description: Tell us what problem it solves or how it improves the experience.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app is this for?
+      options:
+        - Discord Rich Presence
+        - Anime / player detection
+        - Cover artwork
+        - Appearance / themes
+        - Installation / Repair App
+        - Browser extension
+        - Website
+        - Other
