@@ -167,6 +167,16 @@
     }
   }
 
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg?.type !== "forceRefresh") return;
+    lastSent = "";
+    lastHeartbeat = 0;
+    hook();
+    send(true);
+    sendResponse?.({ok:true});
+    return true;
+  });
+
   hook();
   send();
   setInterval(() => { hook(); send(true); }, 2000);
