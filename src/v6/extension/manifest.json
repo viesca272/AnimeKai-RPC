@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnimeKai RPC",
-  "version": "6.0.0.3",
-  "version_name": "6.0.0-alpha.3",
+  "version": "6.0.0.4",
+  "version_name": "6.0.0-alpha.4",
   "description": "Automatic Discord Rich Presence for AnimeKai. Made by viesca27.",
   "permissions": [
     "nativeMessaging",
@@ -13,7 +13,9 @@
   "host_permissions": [
     "https://animekai.be/*",
     "https://www.animekai.be/*",
-    "https://api.jikan.moe/*",
+    "https://api.jikan.moe/*"
+  ],
+  "optional_host_permissions": [
     "<all_urls>"
   ],
   "icons": {
@@ -38,7 +40,8 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "https://animekai.be/*",
+        "https://www.animekai.be/*"
       ],
       "js": [
         "content.js"
