@@ -2,12 +2,36 @@ const $ = id => document.getElementById(id);
 let lastState = null;
 
 const PRESETS = {
-  animekai: {name:"AnimeKai", accent:"#8b5cf6", background:"#0c0b12", cardBackground:"#16131d", theme:"dark"},
-  borealis: {name:"Borealis", accent:"#5eead4", background:"#07171a", cardBackground:"#0d2629", theme:"dark"},
-  charcoal: {name:"Charcoal", accent:"#b4b4b8", background:"#101113", cardBackground:"#1b1d20", theme:"dark"},
-  midnight: {name:"Midnight", accent:"#60a5fa", background:"#070b18", cardBackground:"#10182c", theme:"dark"},
-  sakura: {name:"Sakura", accent:"#f472b6", background:"#190d16", cardBackground:"#2a1424", theme:"dark"},
-  ember: {name:"Ember", accent:"#fb923c", background:"#1a0f09", cardBackground:"#2a1810", theme:"dark"}
+  animekai: {
+    name:"AnimeKai Aurora", accent:"#8b5cf6", background:"#0c0b12", cardBackground:"#16131d", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#0c0b12 0%,#1b1029 58%,#25143b 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(31,22,43,.96),rgba(18,15,27,.96))"
+  },
+  borealis: {
+    name:"Borealis", accent:"#5eead4", background:"#03171d", cardBackground:"#0b2427", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#031219 0%,#07343b 52%,#0f766e 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(12,45,48,.95),rgba(5,25,31,.96))"
+  },
+  charcoal: {
+    name:"Charcoal", accent:"#c4c7ce", background:"#0b0c0f", cardBackground:"#1b1d20", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#090a0c 0%,#181a1f 55%,#30333a 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(43,45,51,.95),rgba(20,21,25,.97))"
+  },
+  midnight: {
+    name:"Midnight", accent:"#60a5fa", background:"#020617", cardBackground:"#10182c", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#020617 0%,#0b1738 52%,#172554 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(23,37,84,.94),rgba(8,18,43,.97))"
+  },
+  sakura: {
+    name:"Sakura", accent:"#f472b6", background:"#180914", cardBackground:"#2a1424", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#160711 0%,#4a1538 56%,#831843 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(76,28,61,.95),rgba(35,14,29,.97))"
+  },
+  ember: {
+    name:"Ember", accent:"#fb923c", background:"#160903", cardBackground:"#2a1810", theme:"dark",
+    backgroundGradient:"linear-gradient(145deg,#120703 0%,#4b1c0b 56%,#9a3412 100%)",
+    cardGradient:"linear-gradient(145deg,rgba(77,35,16,.95),rgba(36,17,10,.97))"
+  }
 };
 
 const fmt = seconds => {
@@ -16,6 +40,7 @@ const fmt = seconds => {
 };
 
 const validHex = value => /^#[0-9a-f]{6}$/i.test(String(value || ""));
+const validGradient = value => typeof value === "string" && /^(linear|radial)-gradient\(/i.test(value.trim());
 
 function setCss(name, value) {
   document.documentElement.style.setProperty(name, value);
@@ -40,15 +65,20 @@ function applyTextMode(theme) {
 
 function applyTheme(s) {
   const settings = s?.settings || {};
-  const accent = validHex(settings.accent) ? settings.accent : PRESETS.animekai.accent;
-  const background = validHex(settings.background) ? settings.background : PRESETS.animekai.background;
-  const cardBackground = validHex(settings.cardBackground) ? settings.cardBackground : PRESETS.animekai.cardBackground;
+  const fallback = PRESETS.animekai;
+  const accent = validHex(settings.accent) ? settings.accent : fallback.accent;
+  const background = validHex(settings.background) ? settings.background : fallback.background;
+  const cardBackground = validHex(settings.cardBackground) ? settings.cardBackground : fallback.cardBackground;
   const theme = settings.theme || "dark";
   const preset = settings.preset || "animekai";
+  const backgroundGradient = validGradient(settings.backgroundGradient) ? settings.backgroundGradient : "none";
+  const cardGradient = validGradient(settings.cardGradient) ? settings.cardGradient : "none";
 
   setCss("--accent", accent);
   setCss("--bg", background);
   setCss("--card", cardBackground);
+  setCss("--bg-gradient", backgroundGradient);
+  setCss("--card-gradient", cardGradient);
   applyTextMode(theme);
 
   $("accent").value = accent;
@@ -83,7 +113,9 @@ function renderSetup(s) {
     $("helper").textContent = "Update";
   } else {
     $("helperState").textContent = "Desktop helper ✓";
-    $("helperHint").textContent = s.hostVersion ? `${s.hostVersion} is installed` : "Connected";
+    $("helperHint").textContent = s.hostVersion
+      ? `${s.hostVersion} • ${s.helperChannel || "stable"}`
+      : "Connected";
     $("helper").textContent = "Reinstall";
   }
 }
@@ -125,6 +157,7 @@ function render(s) {
     `Player access: <b>${s.playerAccess ? "Enabled" : "Limited"}</b><br>` +
     `Native helper: <b>${native ? "Connected" : "Disconnected"}</b><br>` +
     `Helper version: <b>${s.hostVersion || "—"}</b><br>` +
+    `Helper channel: <b>${s.helperChannel || "—"}</b><br>` +
     `Discord RPC: <b>${discord ? "Connected" : "Not connected"}</b><br>` +
     `AnimeKai: <b>${d ? "Detected" : "Not detected"}</b><br>` +
     `Player: <b>${d?.duration ? "Detected" : "Waiting"}</b><br>` +
@@ -153,6 +186,8 @@ function currentAppearance(preset = "custom") {
     accent,
     background,
     cardBackground,
+    backgroundGradient:"",
+    cardGradient:"",
     preset,
     theme:$("theme").value,
     compact:$("compact").checked,
@@ -213,7 +248,7 @@ async function enablePlayerAccess() {
 }
 
 function openSetupRelease() {
-  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.5"});
+  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0"});
 }
 
 $("accent").oninput = e => { $("hex").value = e.target.value; saveAppearance(); };
@@ -222,7 +257,7 @@ $("background").oninput = e => { $("bgHex").value = e.target.value; saveAppearan
 $("bgHex").onchange = () => saveAppearance();
 $("cardColor").oninput = e => { $("cardHex").value = e.target.value; saveAppearance(); };
 $("cardHex").onchange = () => saveAppearance();
-$("theme").onchange = () => saveAppearance();
+$("theme").onchange = () => saveAppearance(lastState?.settings?.preset || "custom");
 $("compact").onchange = () => saveAppearance(lastState?.settings?.preset || "custom");
 $("reduced").onchange = () => saveAppearance(lastState?.settings?.preset || "custom");
 $("resetTheme").onclick = () => applyPreset("animekai");
