@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Welcome to AnimeKai RPC</title>
+  <style>
+    :root{--accent:#8b5cf6;--bg:#0b0910;--card:#17131e;--card2:#100d15;--text:#f7f3ff;--muted:#aaa1b7;--border:#30283b;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#25143b 0,#0b0910 42%);color:var(--text);font:15px "Segoe UI",sans-serif;min-height:100vh}.page{width:min(900px,calc(100% - 32px));margin:0 auto;padding:54px 0 70px}.hero{text-align:center;margin-bottom:28px}.logo{width:74px;height:74px;border-radius:22px;margin:0 auto 16px;background:var(--accent);display:grid;place-items:center;font-size:40px;font-weight:800;box-shadow:0 16px 55px #8b5cf655}.hero h1{font-size:34px;margin:0 0 8px}.hero p{color:var(--muted);margin:0 auto;max-width:620px;line-height:1.55}.badge{display:inline-block;margin-top:12px;border:1px solid #5f437d;background:#1c1229;padding:5px 10px;border-radius:999px;font-size:12px;color:#d8c5f5}.steps{display:grid;gap:14px}.step{display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px}.num{width:42px;height:42px;border-radius:13px;background:var(--card2);display:grid;place-items:center;font-weight:800;color:#d9c7f7}.step h2{font-size:17px;margin:0 0 4px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;max-width:570px}.btn{border:1px solid var(--border);background:#292231;color:var(--text);border-radius:11px;padding:11px 15px;font-weight:650;cursor:pointer;white-space:nowrap}.btn:hover{filter:brightness(1.12)}.btn:disabled{opacity:.6;cursor:default}.primary{background:var(--accent);border-color:transparent}.good{color:#75e4ad}.warn{color:#ffd080}.privacy{background:#110e16;border:1px solid #282130;border-radius:14px;margin-top:18px;padding:14px 16px;color:var(--muted);font-size:12px;line-height:1.6}.privacy b{color:var(--text)}.finish{display:flex;justify-content:center;gap:10px;margin-top:24px}.status{font-size:12px;margin-top:4px}.footer{text-align:center;color:#776e82;font-size:11px;margin-top:28px}@media(max-width:680px){.page{padding-top:28px}.step{grid-template-columns:42px 1fr}.step .btn{grid-column:1/-1;width:100%}.hero h1{font-size:28px}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="logo">A</div>
+      <h1>Welcome to AnimeKai RPC</h1>
+      <p>Alpha 4 makes setup a lot less technical. The Discord application is already included; you only need to allow embedded-player detection and install the small Windows helper.</p>
+      <div class="badge">V6 Alpha 4 • Made by viesca27</div>
+    </section>
+
+    <section class="steps">
+      <article class="step">
+        <div class="num">1</div>
+        <div>
+          <h2>Discord app is already configured</h2>
+          <p>You do not need a Discord Developer Portal account, bot token, client secret, or Application ID. AnimeKai RPC ships with its public Rich Presence application ID.</p>
+          <div class="status good">✓ Nothing to configure here</div>
+        </div>
+        <button class="btn" disabled>Ready</button>
+      </article>
+
+      <article class="step">
+        <div class="num">2</div>
+        <div>
+          <h2>Enable embedded-player detection</h2>
+          <p>AnimeKai loads video players inside third-party frames. This optional browser permission lets AnimeKai RPC inspect those frames for play, pause, buffering, and timestamps. The detector exits immediately when a frame is not inside an AnimeKai page.</p>
+          <div id="playerStatus" class="status warn">Checking permission…</div>
+        </div>
+        <button id="playerAccess" class="btn primary">Enable player detection</button>
+      </article>
+
+      <article class="step">
+        <div class="num">3</div>
+        <div>
+          <h2>Install the Windows helper</h2>
+          <p>The helper is what talks to the Discord desktop app. If you already installed Alpha 4, this step will show as connected. Otherwise download the Windows package, extract it, and run <b>Install AnimeKai RPC.cmd</b>.</p>
+          <div id="helperStatus" class="status warn">Checking helper…</div>
+        </div>
+        <button id="helper" class="btn">Install / update helper</button>
+      </article>
+    </section>
+
+    <div class="privacy"><b>Why is player access optional?</b> Earlier V6 alphas requested broad frame access as a required install permission. Alpha 4 moves it behind this clear setup step instead. AnimeKai uses changing third-party video hosts, so limiting the permission to a fixed list of player domains would regularly break detection. The extension code still ignores pages and frames that are not part of AnimeKai.</div>
+
+    <div class="finish">
+      <button id="check" class="btn">Check again</button>
+      <button id="open" class="btn primary">Open AnimeKai</button>
+    </div>
+    <div class="footer">You can reopen this setup guide from the extension popup at any time.</div>
+  </main>
+  <script src="onboarding.js"></script>
+</body>
+</html>
