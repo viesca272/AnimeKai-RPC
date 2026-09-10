@@ -10,15 +10,16 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.0.0-alpha.2"
+HOST_VERSION = "6.0.0-alpha.3"
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
+PUBLISHER_CLIENT_ID = "1543575455523807385"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
 LOG_FILE = APP_DIR / "native_host.log"
 MANIFEST_FILE = APP_DIR / f"{HOST_NAME}.json"
 DEFAULTS = {
-    "client_id": "",
+    "client_id": PUBLISHER_CLIENT_ID,
     "playbackMode": "auto",
     "showTimestamp": True,
     "detailsTemplate": "{anime}",
@@ -46,12 +47,18 @@ def log(x):
 
 def cfg():
     try:
-        return {**DEFAULTS, **json.loads(CONFIG_FILE.read_text(encoding="utf-8"))}
+        stored = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+        merged = {**DEFAULTS, **stored}
+        if not str(merged.get("client_id") or "").strip():
+            merged["client_id"] = PUBLISHER_CLIENT_ID
+        return merged
     except Exception:
         return DEFAULTS.copy()
 
 
 def save(c):
+    if not str(c.get("client_id") or "").strip():
+        c["client_id"] = PUBLISHER_CLIENT_ID
     CONFIG_FILE.write_text(json.dumps(c, indent=2), encoding="utf-8")
 
 
@@ -75,7 +82,7 @@ def status(error=None):
         "type": "status",
         "discordConnected": discord_connected,
         "hostVersion": HOST_VERSION,
-        "clientId": cfg().get("client_id", "") or "",
+        "clientId": cfg().get("client_id", "") or PUBLISHER_CLIENT_ID,
         "lastError": last_error,
         "error": error,
         "rpcVariant": last_variant,
@@ -90,9 +97,9 @@ def ensure_rpc():
         last_error = "pypresence import failed: " + str(IMPORT_ERROR)
         discord_connected = False
         return False
-    cid = str(cfg().get("client_id") or "").strip()
+    cid = str(cfg().get("client_id") or PUBLISHER_CLIENT_ID).strip()
     if not cid:
-        last_error = "No Discord Application ID saved."
+        last_error = "Bundled Discord Application ID is unavailable."
         discord_connected = False
         return False
     if rpc and discord_connected:
@@ -154,6 +161,8 @@ def activity(d, settings=None, override=None):
 
     c = cfg()
     c.update({k: v for k, v in (settings or {}).items() if v is not None})
+    if not str(c.get("client_id") or "").strip():
+        c["client_id"] = PUBLISHER_CLIENT_ID
     if not ensure_rpc():
         status(last_error)
         return
@@ -278,7 +287,7 @@ def health_snapshot():
         "executable": current_executable().exists(),
         "registry": {},
         "discord": discord_connected,
-        "client_id": bool(str(cfg().get("client_id") or "").strip()),
+        "client_id": bool(str(cfg().get("client_id") or PUBLISHER_CLIENT_ID).strip()),
     }
     if sys.platform.startswith("win"):
         import winreg
@@ -340,6 +349,8 @@ def main():
             if t == "config":
                 c = cfg()
                 c.update(m.get("config") or {})
+                if not str(c.get("client_id") or "").strip():
+                    c["client_id"] = PUBLISHER_CLIENT_ID
                 save(c)
                 reconnect_rpc()
                 status(None if discord_connected else last_error)
