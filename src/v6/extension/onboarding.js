@@ -16,11 +16,11 @@ function render() {
   $("playerAccess").disabled = playerEnabled;
 
   if (state?.nativeConnected && state?.hostVersion === state?.version) {
-    $("helperStatus").textContent = `✓ Desktop helper ${state.hostVersion} is connected`;
+    $("helperStatus").textContent = `✓ Desktop helper ${state.hostVersion} (${state.helperChannel || "stable"}) is connected`;
     $("helperStatus").className = "status good";
     $("helper").textContent = "Reinstall helper";
   } else if (state?.nativeConnected) {
-    $("helperStatus").textContent = `Helper ${state.hostVersion || "unknown"} connected — Alpha 4 update recommended`;
+    $("helperStatus").textContent = `Helper ${state.hostVersion || "unknown"} connected — V6.0.0 update recommended`;
     $("helperStatus").className = "status warn";
     $("helper").textContent = "Update helper";
   } else {
@@ -43,7 +43,7 @@ $("playerAccess").onclick = async () => {
 };
 
 $("helper").onclick = () => {
-  chrome.tabs.create({url:state?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.4"});
+  chrome.tabs.create({url:state?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0"});
 };
 
 $("check").onclick = async () => {
