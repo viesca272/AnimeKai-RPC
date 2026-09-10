@@ -29,26 +29,27 @@ There is no need to manually change your Discord status every episode.
 
 V5 is the version to use if you just want AnimeKai RPC working right now. It uses the stable playback detection and local Discord RPC setup that the project was built around.
 
-### V6 Alpha 4 — Testing
+### V6 Alpha 5 — Testing
 
-V6 Alpha 4 is the current test build in [`src/v6`](src/v6).
+V6 Alpha 5 is the current test build in [`src/v6`](src/v6).
 
 The goal of V6 is to make AnimeKai RPC feel like a normal app that someone can install without needing to know how Native Messaging or Discord Rich Presence works.
 
-Alpha 4 currently includes:
+Alpha 5 currently includes:
 
 - built-in Discord Application ID — no Discord developer setup required
 - first-run setup guide
 - optional embedded-player permission instead of requiring broad site access at install time
 - helper install/update status directly in the popup
 - one-click **Repair App**
-- theme and accent-color customization
+- custom accent, popup background, and card colors
+- six built-in themes: **AnimeKai, Borealis, Charcoal, Midnight, Sakura, and Ember**
 - better cover-art recovery and local caching
 - no generic backup image when a cover fails
 - clearer diagnostics and error messages
 - the V5-style browser extension icon
 
-V6 is still a prerelease, so V5 remains the recommended stable download while Alpha 4 is tested.
+V6 is still a prerelease, so V5 remains the recommended stable download while Alpha 5 is tested.
 
 You can follow development in the [V6 roadmap](docs/V6_ROADMAP.md).
 
@@ -74,7 +75,7 @@ The helper is necessary because Chromium extensions cannot directly access Disco
 
 V6 automatically includes the project's public Discord Application ID, so users do not need to create their own Discord application.
 
-AnimeKai sometimes loads video inside third-party frames. Alpha 4 asks for that broader player access only when the user chooses **Enable player detection** in the setup guide or popup. The extension's player detector checks that the frame belongs to an AnimeKai page before doing anything.
+AnimeKai sometimes loads video inside third-party frames. V6 asks for that broader player access only when the user chooses **Enable player detection** in the setup guide or popup. The extension's player detector checks that the frame belongs to an AnimeKai page before doing anything.
 
 The Windows helper is still required. The popup tells you if it is missing or on an older version and links directly to the matching V6 release.
 
@@ -99,14 +100,20 @@ If that image is missing or broken, the extension can look for another matching 
 
 ## Customization
 
-Current V6 appearance controls include:
+Alpha 5 expands the Appearance section quite a bit. You can change the accent color, the main popup background, and the card/background panels independently.
 
-- accent color picker
-- dark, light, and system modes
-- compact layout toggle
-- reduced-motion toggle
+If you do not feel like building a theme from scratch, there are premade presets:
 
-More presets and theme import/export are planned.
+- **AnimeKai** — the default purple look
+- **Borealis** — dark teal with a mint accent
+- **Charcoal** — neutral gray
+- **Midnight** — deep navy / blue
+- **Sakura** — dark pink / plum
+- **Ember** — warm brown / orange
+
+The dark, light, and system text modes are still available, along with compact layout and reduced motion. Custom colors are saved locally so they stay put when you close the browser or repair/reinstall the helper.
+
+Theme import/export is planned for a later V6 build.
 
 ## Installation
 
