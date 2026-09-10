@@ -10,7 +10,7 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.0.0-alpha.1"
+HOST_VERSION = "6.0.0-alpha.2"
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
@@ -102,6 +102,7 @@ def ensure_rpc():
         rpc.connect()
         discord_connected = True
         last_error = None
+        log("Discord RPC connected")
         return True
     except Exception as e:
         rpc = None
@@ -120,6 +121,18 @@ def close_rpc():
         pass
     rpc = None
     discord_connected = False
+
+
+def reconnect_rpc():
+    global last_error
+    close_rpc()
+    time.sleep(0.15)
+    ok = ensure_rpc()
+    if ok:
+        log("Discord RPC refreshed successfully")
+    else:
+        log("Discord RPC refresh failed: " + str(last_error))
+    return ok
 
 
 def templ(t, d, status_text):
@@ -204,11 +217,10 @@ def activity(d, settings=None, override=None):
         artwork_rejected = bool(image)
         log("Dynamic RPC failed: " + repr(e))
 
-    # V6 intentionally avoids a generic backup artwork asset. If a poster is
-    # rejected, the browser extension looks up another real poster and retries.
     try:
         rpc.update(**base)
         last_variant = "minimal"
+        last_error = None
         last_rpc_update = int(time.time() * 1000)
         discord_connected = True
         status()
@@ -266,6 +278,7 @@ def health_snapshot():
         "executable": current_executable().exists(),
         "registry": {},
         "discord": discord_connected,
+        "client_id": bool(str(cfg().get("client_id") or "").strip()),
     }
     if sys.platform.startswith("win"):
         import winreg
@@ -304,11 +317,11 @@ def repair():
     except Exception as e:
         errors.append("Registry: " + str(e))
 
-    ensure_rpc()
+    reconnect_rpc()
     return {
-        "ok": not errors,
+        "ok": not errors and discord_connected,
         "fixed": fixed,
-        "errors": errors,
+        "errors": errors + ([] if discord_connected else [last_error or "Discord RPC did not reconnect."]),
         "health": health_snapshot(),
     }
 
@@ -328,8 +341,7 @@ def main():
                 c = cfg()
                 c.update(m.get("config") or {})
                 save(c)
-                close_rpc()
-                ensure_rpc()
+                reconnect_rpc()
                 status(None if discord_connected else last_error)
             elif t == "activity":
                 activity(m.get("data") or {}, m.get("settings"))
@@ -351,12 +363,15 @@ def main():
                 h = health_snapshot()
                 send({
                     "type": "health",
-                    "ok": all(h.get("registry", {}).values()) if sys.platform.startswith("win") else False,
+                    "ok": bool(h.get("client_id")) and bool(h.get("discord")) and (all(h.get("registry", {}).values()) if sys.platform.startswith("win") else False),
                     "summary": "Health check complete",
                     "health": h,
                 })
             elif t == "repair":
                 send({"type": "repairResult", **repair()})
+            elif t == "refresh":
+                reconnect_rpc()
+                status(None if discord_connected else last_error)
             elif t == "ping":
                 ensure_rpc()
                 status(None if discord_connected else last_error)
