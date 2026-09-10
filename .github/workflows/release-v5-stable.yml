@@ -1,0 +1,117 @@
+name: Publish V5 Stable
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/release-v5-stable.yml"
+      - "release_sources/v5/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Rebuild V5 source archive
+        shell: pwsh
+        run: |
+          $parts = Get-ChildItem "release_sources/v5/v5-source.part*.b64" | Sort-Object Name
+          if (-not $parts) { throw "V5 source chunks were not found." }
+          $b64 = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          [IO.File]::WriteAllBytes("v5-source.zip", [Convert]::FromBase64String($b64))
+          Expand-Archive "v5-source.zip" -DestinationPath "v5-staging" -Force
+          if (-not (Test-Path "v5-staging/AnimeKai-Discord-RPC-V5")) { throw "V5 source archive did not extract correctly." }
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install native-host build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pypresence pyinstaller
+
+      - name: Build V5 native helper
+        shell: pwsh
+        run: |
+          $root = Resolve-Path "v5-staging/AnimeKai-Discord-RPC-V5"
+          Push-Location "$root/native_host"
+          python -m PyInstaller --onefile --console --name AnimeKaiRPCNativeHost native_host.py
+          Copy-Item "dist/AnimeKaiRPCNativeHost.exe" "AnimeKaiRPCNativeHost.exe" -Force
+          Pop-Location
+
+      - name: Wire GitHub project links into V5 package
+        shell: pwsh
+        run: |
+          $root = Resolve-Path "v5-staging/AnimeKai-Discord-RPC-V5"
+          $publisher = [ordered]@{
+            app_name = "AnimeKai RPC"
+            made_by = "viesca27"
+            discord_application_id = ""
+            release_url = "https://github.com/viesca272/AnimeKai-RPC/releases/latest"
+            support_url = "https://github.com/viesca272/AnimeKai-RPC/issues"
+            website_url = "https://viesca272.github.io/AnimeKai-RPC/"
+          }
+          $publisher | ConvertTo-Json | Set-Content "$root/publisher.json" -Encoding UTF8
+          $publisher | ConvertTo-Json | Set-Content "$root/extension/publisher.json" -Encoding UTF8
+
+      - name: Package V5 stable downloads
+        shell: pwsh
+        run: |
+          $root = Resolve-Path "v5-staging/AnimeKai-Discord-RPC-V5"
+          New-Item -ItemType Directory -Path "release-out" -Force | Out-Null
+          Compress-Archive -Path "$root/*" -DestinationPath "release-out/AnimeKai-RPC-V5.0.0-Windows.zip" -CompressionLevel Optimal
+          Compress-Archive -Path "$root/extension/*" -DestinationPath "release-out/AnimeKai-RPC-V5.0.0-Extension.zip" -CompressionLevel Optimal
+          Get-FileHash "release-out/AnimeKai-RPC-V5.0.0-Windows.zip" -Algorithm SHA256 | Format-List
+          Get-FileHash "release-out/AnimeKai-RPC-V5.0.0-Extension.zip" -Algorithm SHA256 | Format-List
+
+      - name: Publish V5 stable release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v5.0.0
+          target_commitish: main
+          name: AnimeKai RPC V5.0.0
+          prerelease: false
+          draft: false
+          make_latest: true
+          body: |
+            # AnimeKai RPC V5.0.0
+
+            **Stable release — Made by viesca27**
+
+            V5 is the proven stable build while V6 is being tested.
+
+            ## What V5 includes
+
+            - Automatic AnimeKai title and episode detection
+            - Play / pause / buffering detection
+            - Discord Rich Presence with timestamps
+            - Native Messaging helper for Windows
+            - Opera / Chrome / Edge support
+            - Website-style setup window
+            - Install, Repair, Uninstall, health checks, and diagnostics
+            - Existing local configuration can carry forward from earlier V4 builds
+
+            ## Recommended download
+
+            Download **AnimeKai-RPC-V5.0.0-Windows.zip**, extract it, then run `Install AnimeKai RPC.cmd`.
+
+            The extension is still installed with Developer mode → Load unpacked in V5. Browser-store installation is being worked on for V6.
+
+            ## Fresh-install note
+
+            This stable archive does not contain a private Discord credential. If no Application ID is already saved on the PC, enter the project's Discord Application ID in Advanced settings before testing RPC.
+
+            **Made by viesca27**
+          files: |
+            release-out/AnimeKai-RPC-V5.0.0-Windows.zip
+            release-out/AnimeKai-RPC-V5.0.0-Extension.zip
