@@ -1,57 +1,55 @@
 # AnimeKai RPC V6
 
-**Status:** Alpha 5 — active testing  
+**Status:** Stable — 6.0.0  
 **Made by viesca27**
 
-V6 keeps the playback detection and Discord RPC path that proved stable in V4.2.3/V5, while making setup and customization feel much closer to a normal browser extension + companion app.
+V6.0.0 is the official AnimeKai RPC release. It keeps the playback/RPC path proven by V5 and rolls in the setup, repair, artwork, permission, and appearance work tested throughout the V6 alpha builds.
 
-## What's in Alpha 5
+## Included in V6.0.0
 
-- Built-in public Discord Application ID — users do not need to create or enter one
-- V5-style extension icon in the browser toolbar and Extensions page
-- Refresh / reconnect button for Discord RPC and AnimeKai detection
-- First-run setup page with plain-English status checks
-- Required host access limited to AnimeKai + the artwork provider
-- Broad cross-origin player access kept behind an optional permission that is requested only when the user enables embedded-player detection
-- Popup status for player access and desktop-helper version
-- Direct **Install / Update Helper** path from the popup and setup guide
-- One-click **Repair App** with Native Messaging and Discord reconnect checks
-- Expanded Appearance controls with custom accent, popup background and card colors
-- Built-in theme presets: **AnimeKai, Borealis, Charcoal, Midnight, Sakura and Ember**
-- Presets and custom colors are saved locally and survive normal helper repair/reinstall flows
-- Alternate anime cover lookup through Jikan with a 7-day local cache
-- Real cover retry behavior instead of a generic fallback image
+- Built-in public Discord Application ID — no Discord developer setup required
+- V5-style extension icon
+- Refresh / reconnect control
+- First-run setup guide
+- Required host access limited to AnimeKai + Jikan
+- Optional third-party player-frame access for embedded playback detection
+- Desktop-helper version/status checks
+- Install / Update Helper links
+- One-click **Repair App**
+- Alternate anime cover lookup with a 7-day local cache
+- Text-only RPC fallback if artwork cannot be used
+- Custom accent, popup background, and card colors
+- Six gradient appearance presets
+- Dark, light, and system text modes
+- Compact layout and reduced-motion options
 
-## Appearance presets
+## Gradient presets
 
-Alpha 5 adds a quick way to completely change the look of the extension popup without touching any RPC settings.
+The official V6 presets use gradients instead of flat backgrounds:
 
-The default **AnimeKai** preset keeps the purple V5/V6 look. **Borealis** uses a dark teal palette, **Charcoal** stays neutral and low-key, **Midnight** leans deep blue, **Sakura** uses a dark pink palette, and **Ember** uses warm orange/brown tones.
+- **AnimeKai Aurora** — deep purple into violet
+- **Borealis** — dark ocean teal into aurora green
+- **Charcoal** — black into graphite gray
+- **Midnight** — near-black navy into deep blue
+- **Sakura** — dark plum into cherry pink
+- **Ember** — near-black brown into burnt orange
 
-Users can also make their own theme by changing the accent, background and card colors individually. Any manual color change switches the appearance label to **Custom**.
+Manual background/card color changes switch the appearance to a flat **Custom** theme so users can choose exact colors without fighting the preset gradient.
 
-## Why does player detection ask for optional site access?
+## Desktop helper 6.0.0
 
-AnimeKai can load its video player inside third-party frames, and those video-host domains may change. V6 no longer asks for broad access as a required install permission.
+The stable helper now reports its version, release channel, and protocol version back to the extension. It also has clearer Discord connection errors, retries the initial Discord connection once, records install metadata, and keeps the existing Repair App behavior.
 
-Instead, the setup guide explains the reason and lets the user enable that access explicitly. The content script checks whether the frame belongs to an AnimeKai page and exits immediately when it does not.
+The Windows installer preserves existing V5/V6 RPC preferences and any already-added extension origins in the Native Messaging manifest while upgrading the helper.
 
-Without the optional player permission, AnimeKai title/episode detection can still work on the AnimeKai page, but playback state and timestamps may stay in a limited/waiting state depending on the embedded player.
+## Player permission
 
-## Still being worked on
+AnimeKai may embed video from changing third-party hosts. V6 therefore keeps `<all_urls>` out of required install-time host permissions and asks for broad frame access only when the user explicitly enables **Player detection**.
 
-- Chrome Web Store / Edge Add-ons production IDs in the native-host allowlist
-- Signed desktop-helper installer
-- True automatic helper updating instead of the current guided update button
-- Theme import/export and compact-layout polish
-- More accessibility options
-- Store screenshots, listing copy and final privacy-policy review
-- Testing clean installs and upgrades across Opera, Chrome and Edge
+The detector verifies that the frame belongs to an AnimeKai page and exits when it does not.
 
-## Testing
+## Current store work
 
-V6 is still a prerelease. V5 remains the stable release while Alpha 5 is tested.
+The code is prepared for browser-store distribution, but the unpacked GitHub build remains the current installation method until the store listings are published. The remaining work is mainly production extension IDs/allowlisting, store screenshots/listing assets, signing the Windows helper installer, and final privacy-review details.
 
-For Alpha 5, please test the normal AnimeKai/Discord flow plus the appearance system. Try switching between presets, changing each color manually, closing/reopening the popup, and reinstalling the helper to make sure the chosen appearance stays intact.
-
-The development build still uses the pinned V5/V6 extension ID so the existing native-host registration continues to work during testing.
+V5 remains available as a legacy fallback release.
