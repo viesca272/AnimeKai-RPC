@@ -19,14 +19,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Rebuild V5 source archive
+      - name: Rebuild and verify V5 source archive
         shell: pwsh
         run: |
           $parts = Get-ChildItem "release_sources/v5/v5-source.part*.b64" | Sort-Object Name
           if (-not $parts) { throw "V5 source chunks were not found." }
-          $b64 = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
-          [IO.File]::WriteAllBytes("v5-source.zip", [Convert]::FromBase64String($b64))
-          Expand-Archive "v5-source.zip" -DestinationPath "v5-staging" -Force
+          $b64 = (($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join "") -replace '\s',''
+          $bytes = [Convert]::FromBase64String($b64)
+          [IO.File]::WriteAllBytes("v5-source.zip", $bytes)
+
+          $hash = (Get-FileHash "v5-source.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expected = "5cae1367791d3b1b69610c75cac71395d355ccdee5628c23060ae270b3b33f02"
+          if ($hash -ne $expected) { throw "V5 source archive hash mismatch. Expected $expected but got $hash." }
+
+          New-Item -ItemType Directory -Path "v5-staging" -Force | Out-Null
+          tar.exe -xf "v5-source.zip" -C "v5-staging"
+          if ($LASTEXITCODE -ne 0) { throw "tar failed to extract the V5 source archive." }
           if (-not (Test-Path "v5-staging/AnimeKai-Discord-RPC-V5")) { throw "V5 source archive did not extract correctly." }
 
       - name: Set up Python
