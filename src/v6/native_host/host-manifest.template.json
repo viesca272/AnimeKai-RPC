@@ -1,0 +1,9 @@
+{
+  "name": "com.animekai.discordrpc",
+  "description": "AnimeKai Discord RPC V6 native host - Made by viesca27",
+  "path": "__INSTALL_DIR__\\AnimeKaiRPCNativeHost.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://jjmnjgihigllehhjfhcmhcgnkhjdablc/"
+  ]
+}
