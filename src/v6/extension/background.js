@@ -1,8 +1,9 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0-alpha.2";
+const VERSION = "6.0.0-alpha.3";
+const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const DEFAULTS = {
   enabled: true,
-  client_id: "",
+  client_id: PUBLISHER_CLIENT_ID,
   playbackMode: "auto",
   showTimestamp: true,
   detailsTemplate: "{anime}",
@@ -44,7 +45,10 @@ async function init() {
   } catch {}
   const stored = await chrome.storage.local.get(DEFAULTS);
   settings = {...DEFAULTS, ...stored};
-  if (!settings.client_id && publisher.discord_application_id) settings.client_id = publisher.discord_application_id;
+  // Alpha 3 ships with the public AnimeKai RPC Discord application ID.
+  // Users no longer need to create or enter an Application ID themselves.
+  settings.client_id = String(publisher.discord_application_id || PUBLISHER_CLIENT_ID).trim();
+  await chrome.storage.local.set({client_id: settings.client_id});
   state.settings = settings;
   connectNative();
 }
@@ -57,7 +61,7 @@ function broadcast() {
 
 function nativeConfig() {
   return {
-    client_id: settings.client_id,
+    client_id: settings.client_id || PUBLISHER_CLIENT_ID,
     playbackMode: settings.playbackMode,
     showTimestamp: settings.showTimestamp,
     detailsTemplate: settings.detailsTemplate,
@@ -79,7 +83,7 @@ function connectNative() {
       port = null;
       broadcast();
     });
-    if (settings.client_id) port.postMessage({type:"config", config:nativeConfig()});
+    port.postMessage({type:"config", config:nativeConfig()});
     if (current && settings.enabled) sendActivity(true);
     broadcast();
     return true;
@@ -99,10 +103,6 @@ function onNativeMessage(msg) {
     state.rpcVariant = msg.rpcVariant || state.rpcVariant;
     state.rpcLastUpdate = msg.rpcLastUpdate || state.rpcLastUpdate;
     state.lastError = msg.lastError || msg.error || null;
-    if (!settings.client_id && msg.clientId) {
-      settings.client_id = String(msg.clientId);
-      chrome.storage.local.set({client_id:settings.client_id});
-    }
     if (msg.artworkRejected && current?.title) resolveAlternateCover(current.title, current.image, true);
   } else if (msg?.type === "health") {
     state.repair = {kind:"health", ...msg};
@@ -124,8 +124,7 @@ async function refreshNow() {
   state.lastRefresh = Date.now();
   state.lastError = null;
   connectNative();
-
-  if (settings.client_id) sendNative({type:"config", config:nativeConfig()});
+  sendNative({type:"config", config:nativeConfig()});
   sendNative({type:"refresh"});
 
   try {
@@ -237,7 +236,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "clearPage" && tabId != null) { pages.delete(tabId); if (!pages.size) {current=null;sendNative({type:"clear"});} broadcast(); sendResponse({ok:true}); return true; }
   if (msg.type === "getState") { connectNative(); sendResponse(state); return true; }
   if (msg.type === "setSettings") {
-    settings = {...settings, ...(msg.settings||{})};
+    const incoming = {...(msg.settings||{})};
+    delete incoming.client_id;
+    settings = {...settings, ...incoming, client_id:PUBLISHER_CLIENT_ID};
     chrome.storage.local.set(settings);
     state.settings = settings;
     sendNative({type:"config", config:nativeConfig()});
@@ -253,7 +254,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const d = current;
     sendResponse({text:[
       `AnimeKai RPC ${VERSION}`, `Made by viesca27`,
-      `Application ID: ${settings.client_id?"Configured":"Missing"}`,
+      `Discord application: Bundled`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
       `Discord RPC: ${state.discordConnected?"Connected":"Not connected"}`,
