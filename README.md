@@ -23,31 +23,32 @@ It can show:
 
 There is no need to manually change your Discord status every episode.
 
-## Current version
+## Current versions
 
 ### V5 — Stable
 
-V5 is the version to use if you just want AnimeKai RPC working right now.
+V5 is the version to use if you just want AnimeKai RPC working right now. It uses the stable playback detection and local Discord RPC setup that the project was built around.
 
-It uses the stable playback detection and local Discord RPC setup that the project was built around.
+### V6 Alpha 4 — Testing
 
-### V6 — In development
+V6 Alpha 4 is the current test build in [`src/v6`](src/v6).
 
-V6 is currently being built in [`src/v6`](src/v6).
+The goal of V6 is to make AnimeKai RPC feel like a normal app that someone can install without needing to know how Native Messaging or Discord Rich Presence works.
 
-The main goal of V6 is to make AnimeKai RPC feel more like a normal app that anyone can install and use without needing to understand how the technical parts work.
+Alpha 4 currently includes:
 
-Some of the V6 work includes:
-
-- browser-store-ready extension packaging
+- built-in Discord Application ID — no Discord developer setup required
+- first-run setup guide
+- optional embedded-player permission instead of requiring broad site access at install time
+- helper install/update status directly in the popup
 - one-click **Repair App**
-- a cleaner first-run setup
 - theme and accent-color customization
 - better cover-art recovery and local caching
 - no generic backup image when a cover fails
 - clearer diagnostics and error messages
-- better desktop-helper updates
-- accessibility options such as reduced motion
+- the V5-style browser extension icon
+
+V6 is still a prerelease, so V5 remains the recommended stable download while Alpha 4 is tested.
 
 You can follow development in the [V6 roadmap](docs/V6_ROADMAP.md).
 
@@ -67,15 +68,19 @@ Discord Rich Presence
 
 The browser extension detects the anime and playback state. The Windows helper then talks to the Discord desktop app.
 
-The helper is necessary because Chromium extensions cannot directly access Discord's local IPC connection.
+The helper is necessary because Chromium extensions cannot directly access Discord's local IPC connection. The Rich Presence itself does **not** require a cloud server.
 
-The Rich Presence itself does **not** require a cloud server.
+## V6 setup
 
-## V6 Repair App
+V6 automatically includes the project's public Discord Application ID, so users do not need to create their own Discord application.
 
-One of the features I really wanted for V6 was a simple way to fix the app if something gets messed up.
+AnimeKai sometimes loads video inside third-party frames. Alpha 4 asks for that broader player access only when the user chooses **Enable player detection** in the setup guide or popup. The extension's player detector checks that the frame belongs to an AnimeKai page before doing anything.
 
-Instead of making users dig through folders or registry entries, **Repair App** is being designed to check things like:
+The Windows helper is still required. The popup tells you if it is missing or on an older version and links directly to the matching V6 release.
+
+## Repair App
+
+Instead of making users dig through folders or registry entries, **Repair App** checks things like:
 
 - desktop helper installation
 - Native Messaging manifest
@@ -84,41 +89,38 @@ Instead of making users dig through folders or registry entries, **Repair App** 
 - Discord RPC connection
 - local configuration
 
-If something can be safely fixed automatically, the app will fix it and explain what happened.
-
-Your personal themes and settings should stay untouched during a normal repair. A full reset will be a separate option.
+If something can be safely fixed automatically, the app fixes it and explains what happened. Personal themes and settings are kept during a normal repair.
 
 ## Better cover artwork
 
 V6 first tries to use the cover provided by AnimeKai.
 
-If that image is missing or broken, the extension can look for another matching anime poster from an anime metadata provider and cache the result locally.
-
-The goal is to keep a real anime cover in Discord instead of falling back to a generic placeholder whenever artwork fails.
+If that image is missing or broken, the extension can look for another matching anime poster from an anime metadata provider and cache the result locally. The goal is to keep a real anime cover in Discord instead of falling back to a generic placeholder.
 
 ## Customization
 
-V6 is also getting an Appearance section so users can make the extension feel more personal.
+Current V6 appearance controls include:
 
-Planned options include:
+- accent color picker
+- dark, light, and system modes
+- compact layout toggle
+- reduced-motion toggle
 
-- accent color picker / color wheel
-- dark, light, and system themes
-- compact and detailed layouts
-- reduced-motion mode
-- theme presets
-- optional gradients and background effects
-- import / export theme settings
-
-None of this should interfere with the actual playback or RPC logic.
+More presets and theme import/export are planned.
 
 ## Installation
 
-V5 currently uses a Chromium extension plus a small Windows Native Messaging helper.
+### Stable V5
 
-V6 is being prepared for browser-store distribution so normal users will eventually be able to install the extension from a store instead of using **Developer mode → Load unpacked**.
+Use the latest stable GitHub Release if you want the most proven build.
 
-The Windows helper will still be required, but the extension will detect when it is missing and guide the user through installing it.
+### V6 testing
+
+Download the newest V6 prerelease Windows ZIP, extract it, run **Install AnimeKai RPC.cmd**, then load the included `extension` folder as an unpacked extension while V6 is still in testing.
+
+On a fresh V6 install, the extension opens a setup page that walks through player access and the desktop helper.
+
+V6 is being prepared for browser-store distribution so normal users will eventually be able to install the extension without **Developer mode → Load unpacked**.
 
 ## Found a bug?
 
@@ -143,7 +145,7 @@ It does **not** need your:
 - bot token
 - client secret
 
-The Discord Application ID used for Rich Presence is a public identifier and can safely be included in the app.
+The Discord Application ID used for Rich Presence is a public identifier and is included in V6 so users do not have to configure one themselves.
 
 See the project's [privacy page](privacy.html) for more information.
 
