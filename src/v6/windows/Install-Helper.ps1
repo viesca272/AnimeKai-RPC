@@ -48,4 +48,4 @@ if(!(Test-Path $configFile)){
 
 $title = if($Repair){"AnimeKai RPC V6 repaired"}else{"AnimeKai RPC V6 helper installed"}
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("$title successfully.`n`nNext, load the included extension folder in Opera/Chrome/Edge and open AnimeKai.`n`nExisting V5/V6 settings were preserved.","AnimeKai RPC V6 Alpha 1") | Out-Null
+[System.Windows.MessageBox]::Show("$title successfully.`n`nAlpha 2 adds Discord reconnect/refresh support and restores the Application ID control in the popup.`n`nExisting V5/V6 settings were preserved.","AnimeKai RPC V6 Alpha 2") | Out-Null
