@@ -1,6 +1,8 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0-alpha.3";
+const VERSION = "6.0.0-alpha.4";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
+const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.4";
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
@@ -35,8 +37,34 @@ const state = {
   lastError: null,
   current: null,
   repair: null,
-  settings
+  settings,
+  playerAccess: false,
+  setupUrl: SETUP_URL
 };
+
+async function syncPlayerAccess() {
+  try {
+    const granted = await chrome.permissions.contains({origins:["<all_urls>"]});
+    state.playerAccess = !!granted;
+    const registered = await chrome.scripting.getRegisteredContentScripts({ids:[PLAYER_SCRIPT_ID]});
+    if (granted && !registered.length) {
+      await chrome.scripting.registerContentScripts([{
+        id: PLAYER_SCRIPT_ID,
+        matches: ["<all_urls>"],
+        js: ["content.js"],
+        runAt: "document_idle",
+        allFrames: true,
+        matchOriginAsFallback: true
+      }]);
+    } else if (!granted && registered.length) {
+      await chrome.scripting.unregisterContentScripts({ids:[PLAYER_SCRIPT_ID]});
+    }
+  } catch (e) {
+    state.playerAccess = false;
+    state.lastError = `Player access setup: ${e.message}`;
+  }
+  broadcast();
+}
 
 async function init() {
   try {
@@ -45,17 +73,17 @@ async function init() {
   } catch {}
   const stored = await chrome.storage.local.get(DEFAULTS);
   settings = {...DEFAULTS, ...stored};
-  // Alpha 3 ships with the public AnimeKai RPC Discord application ID.
-  // Users no longer need to create or enter an Application ID themselves.
   settings.client_id = String(publisher.discord_application_id || PUBLISHER_CLIENT_ID).trim();
   await chrome.storage.local.set({client_id: settings.client_id});
   state.settings = settings;
+  await syncPlayerAccess();
   connectNative();
 }
 
 function broadcast() {
   state.current = current;
   state.settings = settings;
+  state.setupUrl = publisher.v6_release_url || SETUP_URL;
   chrome.runtime.sendMessage({type:"v6State", state}).catch(()=>{});
 }
 
@@ -123,6 +151,7 @@ function sendNative(message) {
 async function refreshNow() {
   state.lastRefresh = Date.now();
   state.lastError = null;
+  await syncPlayerAccess();
   connectNative();
   sendNative({type:"config", config:nativeConfig()});
   sendNative({type:"refresh"});
@@ -230,11 +259,21 @@ async function resolveAlternateCover(title, failedUrl="", force=false) {
   }
 }
 
+chrome.runtime.onInstalled.addListener(details => {
+  if (details.reason === "install") {
+    chrome.tabs.create({url:chrome.runtime.getURL("onboarding.html")}).catch(()=>{});
+  }
+  syncPlayerAccess();
+});
+
+chrome.permissions.onAdded.addListener(() => syncPlayerAccess());
+chrome.permissions.onRemoved.addListener(() => syncPlayerAccess());
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   const tabId = sender.tab?.id;
   if (msg.type === "frameState" && tabId != null) { merge(tabId, sender.frameId ?? 0, msg.data||{}); sendResponse({ok:true}); return true; }
   if (msg.type === "clearPage" && tabId != null) { pages.delete(tabId); if (!pages.size) {current=null;sendNative({type:"clear"});} broadcast(); sendResponse({ok:true}); return true; }
-  if (msg.type === "getState") { connectNative(); sendResponse(state); return true; }
+  if (msg.type === "getState") { connectNative(); syncPlayerAccess().then(()=>sendResponse(state)); return true; }
   if (msg.type === "setSettings") {
     const incoming = {...(msg.settings||{})};
     delete incoming.client_id;
@@ -244,6 +283,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendNative({type:"config", config:nativeConfig()});
     sendActivity(true); broadcast(); sendResponse({ok:true}); return true;
   }
+  if (msg.type === "syncPlayerAccess") { syncPlayerAccess().then(()=>sendResponse({ok:true,playerAccess:state.playerAccess})); return true; }
   if (msg.type === "refresh") { refreshNow().then(()=>sendResponse({ok:true})).catch(e=>sendResponse({ok:false,error:e.message})); return true; }
   if (msg.type === "test") { sendNative({type:"test", settings:nativeConfig()}); sendResponse({ok:true}); return true; }
   if (msg.type === "clear") { current=null; sendNative({type:"clear"}); broadcast(); sendResponse({ok:true}); return true; }
@@ -255,6 +295,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({text:[
       `AnimeKai RPC ${VERSION}`, `Made by viesca27`,
       `Discord application: Bundled`,
+      `Player access: ${state.playerAccess?"Enabled":"Limited"}`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
       `Discord RPC: ${state.discordConnected?"Connected":"Not connected"}`,
