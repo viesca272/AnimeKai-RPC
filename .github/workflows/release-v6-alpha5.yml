@@ -1,0 +1,120 @@
+name: Publish V6 Alpha 5
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/release-v6-alpha5.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate extension JavaScript and manifest
+        shell: pwsh
+        run: |
+          node --check src/v6/extension/background.js
+          node --check src/v6/extension/content.js
+          node --check src/v6/extension/popup.js
+          node --check src/v6/extension/onboarding.js
+
+          $manifest = Get-Content src/v6/extension/manifest.json -Raw | ConvertFrom-Json
+          if ($manifest.version_name -ne "6.0.0-alpha.5") { throw "Manifest version_name is not Alpha 5." }
+          if ($manifest.host_permissions -contains "<all_urls>") { throw "<all_urls> must not be a required Alpha 5 host permission." }
+          if ($manifest.optional_host_permissions -notcontains "<all_urls>") { throw "Alpha 5 optional player permission is missing." }
+
+          $popup = Get-Content src/v6/extension/popup.html -Raw
+          $popupJs = Get-Content src/v6/extension/popup.js -Raw
+          foreach($preset in @("Borealis","Charcoal","Midnight","Sakura","Ember")) {
+            if ($popup -notmatch $preset -and $popupJs -notmatch $preset) { throw "Missing Alpha 5 preset: $preset" }
+          }
+          foreach($control in @("background","cardColor","bgHex","cardHex")) {
+            if ($popup -notmatch ('id="' + $control + '"')) { throw "Missing appearance control: $control" }
+          }
+          if (!(Test-Path "src/v6/extension/onboarding.html")) { throw "Missing onboarding page." }
+          foreach($icon in @("icon16.png","icon32.png","icon48.png","icon128.png")) {
+            if (!(Test-Path "src/v6/extension/icons/$icon")) { throw "Missing extension icon: $icon" }
+          }
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Validate native helper Python
+        shell: pwsh
+        run: |
+          python -m py_compile src/v6/native_host/native_host.py
+          $text = Get-Content src/v6/native_host/native_host.py -Raw
+          if ($text -notmatch 'HOST_VERSION = "6\.0\.0-alpha\.5"') { throw "Native helper version is not Alpha 5." }
+          if ($text -notmatch '1543575455523807385') { throw "Bundled Discord Application ID is missing." }
+
+      - name: Install native-host build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "pypresence==4.6.2" "pyinstaller>=6.15,<7"
+
+      - name: Build native helper
+        shell: pwsh
+        run: |
+          python -m PyInstaller --clean --onefile --console --name AnimeKaiRPCNativeHost src/v6/native_host/native_host.py
+          if (!(Test-Path "dist/AnimeKaiRPCNativeHost.exe")) { throw "Native helper build failed." }
+
+      - name: Package V6 Alpha 5
+        shell: pwsh
+        run: |
+          $out = "release"
+          $stage = Join-Path $out "AnimeKai-RPC-V6.0.0-alpha.5"
+          Remove-Item $out -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          New-Item -ItemType Directory -Force -Path (Join-Path $stage "native_host") | Out-Null
+          New-Item -ItemType Directory -Force -Path (Join-Path $stage "windows") | Out-Null
+
+          Copy-Item "src/v6/extension" (Join-Path $stage "extension") -Recurse
+          Copy-Item "dist/AnimeKaiRPCNativeHost.exe" (Join-Path $stage "native_host/AnimeKaiRPCNativeHost.exe")
+          Copy-Item "src/v6/windows/Install-Helper.ps1" (Join-Path $stage "windows/Install-Helper.ps1")
+          Copy-Item "docs/V6_ALPHA5_RELEASE_NOTES.md" (Join-Path $stage "README.md")
+          Copy-Item "LICENSE" (Join-Path $stage "LICENSE") -ErrorAction SilentlyContinue
+
+          '@echo off
+          cd /d "%~dp0"
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0windows\Install-Helper.ps1"' | Set-Content (Join-Path $stage "Install AnimeKai RPC.cmd") -Encoding ASCII
+
+          '@echo off
+          cd /d "%~dp0"
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0windows\Install-Helper.ps1" -Repair' | Set-Content (Join-Path $stage "Repair AnimeKai RPC.cmd") -Encoding ASCII
+
+          '@echo off
+          cd /d "%~dp0"
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference=''SilentlyContinue''; $n=''com.animekai.discordrpc''; foreach($b in @(''HKCU:\Software\Google\Chrome\NativeMessagingHosts'',''HKCU:\Software\Chromium\NativeMessagingHosts'',''HKCU:\Software\Microsoft\Edge\NativeMessagingHosts'')){Remove-Item ($b+''\''+$n) -Recurse -Force}; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\AnimeKaiRPCNativeHost.exe'') -Force; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\com.animekai.discordrpc.json'') -Force"' | Set-Content (Join-Path $stage "Uninstall AnimeKai RPC.cmd") -Encoding ASCII
+
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.0.0-alpha.5-Windows.zip") -CompressionLevel Optimal
+          Compress-Archive -Path "src/v6/extension/*" -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.0.0-alpha.5-Extension.zip") -CompressionLevel Optimal
+
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.0.0-alpha.5-Windows.zip") -Algorithm SHA256 | Format-List
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.0.0-alpha.5-Extension.zip") -Algorithm SHA256 | Format-List
+
+      - name: Publish GitHub prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "v6.0.0-alpha.5"
+          $windows = "release/AnimeKai-RPC-V6.0.0-alpha.5-Windows.zip"
+          $extension = "release/AnimeKai-RPC-V6.0.0-alpha.5-Extension.zip"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $windows $extension --clobber
+            gh release edit $tag --title "AnimeKai RPC V6 Alpha 5" --notes-file "docs/V6_ALPHA5_RELEASE_NOTES.md" --prerelease
+          } else {
+            gh release create $tag $windows $extension --target $env:GITHUB_SHA --title "AnimeKai RPC V6 Alpha 5" --notes-file "docs/V6_ALPHA5_RELEASE_NOTES.md" --prerelease
+          }
