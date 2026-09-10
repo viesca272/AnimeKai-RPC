@@ -1,0 +1,33 @@
+name: Bug report
+description: Something in AnimeKai RPC is not working
+body:
+  - type: markdown
+    attributes:
+      value: "Thanks for reporting it. Please use **Copy diagnostics** in AnimeKai RPC first — it makes these much easier to fix."
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Tell us what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Paste the output from Copy diagnostics. Remove anything you do not want to share.
+      render: text
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Opera
+        - Chrome
+        - Edge
+        - Other
+  - type: input
+    id: version
+    attributes:
+      label: AnimeKai RPC version
+      placeholder: 6.0.0-alpha.1
