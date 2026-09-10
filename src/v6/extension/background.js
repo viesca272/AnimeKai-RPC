@@ -1,8 +1,8 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0-alpha.5";
+const VERSION = "6.0.0";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0-alpha.5";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0";
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
@@ -13,6 +13,8 @@ const DEFAULTS = {
   accent: "#8b5cf6",
   background: "#0c0b12",
   cardBackground: "#16131d",
+  backgroundGradient: "linear-gradient(145deg,#0c0b12 0%,#1b1029 58%,#25143b 100%)",
+  cardGradient: "linear-gradient(145deg,rgba(31,22,43,.96),rgba(18,15,27,.96))",
   preset: "animekai",
   theme: "dark",
   compact: false,
@@ -33,6 +35,8 @@ const state = {
   nativeConnected: false,
   discordConnected: false,
   hostVersion: null,
+  helperChannel: null,
+  helperProtocol: null,
   rpcVariant: null,
   rpcLastUpdate: null,
   lastUpdate: null,
@@ -131,6 +135,8 @@ function onNativeMessage(msg) {
   if (msg?.type === "status") {
     state.discordConnected = !!msg.discordConnected;
     state.hostVersion = msg.hostVersion || state.hostVersion;
+    state.helperChannel = msg.helperChannel || state.helperChannel;
+    state.helperProtocol = msg.protocolVersion || state.helperProtocol;
     state.rpcVariant = msg.rpcVariant || state.rpcVariant;
     state.rpcLastUpdate = msg.rpcLastUpdate || state.rpcLastUpdate;
     state.lastError = msg.lastError || msg.error || null;
@@ -302,6 +308,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       `Appearance preset: ${settings.preset || "custom"}`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
+      `Helper channel: ${state.helperChannel||"—"}`,
+      `Helper protocol: ${state.helperProtocol||"—"}`,
       `Discord RPC: ${state.discordConnected?"Connected":"Not connected"}`,
       `AnimeKai: ${d?"Detected":"Not detected"}`,
       `Player: ${d?.duration?"Detected":"Waiting"}`,
