@@ -8,6 +8,7 @@ $InstalledExe = Join-Path $InstallDir "AnimeKaiRPCNativeHost.exe"
 $HostName = "com.animekai.discordrpc"
 $Manifest = Join-Path $InstallDir "$HostName.json"
 $ExtensionId = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
+$PublisherClientId = "1543575455523807385"
 
 if(!(Test-Path $SourceExe)){
   throw "AnimeKaiRPCNativeHost.exe is missing from this package. Download the full V6 Alpha release ZIP, not just the source code."
@@ -36,16 +37,27 @@ foreach($base in @(
 }
 
 $configFile = Join-Path $InstallDir "config.json"
-if(!(Test-Path $configFile)){
-  [ordered]@{
-    client_id = ""
-    playbackMode = "auto"
-    showTimestamp = $true
-    detailsTemplate = "{anime}"
-    stateTemplate = "Episode {episode} / {total} • {status}"
-  } | ConvertTo-Json | Set-Content -Path $configFile -Encoding UTF8
+$config = [ordered]@{
+  client_id = $PublisherClientId
+  playbackMode = "auto"
+  showTimestamp = $true
+  detailsTemplate = "{anime}"
+  stateTemplate = "Episode {episode} / {total} • {status}"
 }
+
+# Keep existing personal RPC preferences, but always seed the public
+# AnimeKai RPC Discord Application ID so fresh users never need to enter it.
+if(Test-Path $configFile){
+  try {
+    $existing = Get-Content $configFile -Raw | ConvertFrom-Json
+    if($null -ne $existing.playbackMode){ $config.playbackMode = $existing.playbackMode }
+    if($null -ne $existing.showTimestamp){ $config.showTimestamp = [bool]$existing.showTimestamp }
+    if($null -ne $existing.detailsTemplate){ $config.detailsTemplate = [string]$existing.detailsTemplate }
+    if($null -ne $existing.stateTemplate){ $config.stateTemplate = [string]$existing.stateTemplate }
+  } catch {}
+}
+$config | ConvertTo-Json | Set-Content -Path $configFile -Encoding UTF8
 
 $title = if($Repair){"AnimeKai RPC V6 repaired"}else{"AnimeKai RPC V6 helper installed"}
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("$title successfully.`n`nAlpha 2 adds Discord reconnect/refresh support and restores the Application ID control in the popup.`n`nExisting V5/V6 settings were preserved.","AnimeKai RPC V6 Alpha 2") | Out-Null
+[System.Windows.MessageBox]::Show("$title successfully.`n`nAlpha 3 includes the AnimeKai RPC Discord application automatically, so users no longer need to enter an Application ID.`n`nExisting appearance and RPC preferences were preserved.","AnimeKai RPC V6 Alpha 3") | Out-Null
