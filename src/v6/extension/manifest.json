@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "AnimeKai RPC",
+  "version": "6.0.0",
+  "version_name": "6.0.0-alpha.1",
+  "description": "Automatic Discord Rich Presence for AnimeKai. Made by viesca27.",
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://animekai.be/*",
+    "https://www.animekai.be/*",
+    "https://api.jikan.moe/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_title": "AnimeKai RPC V6",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqpv7CAwU3qYAUsAfyTMr7j8GY3effVz9dQHTcMpSxq2E8/tKixQCkOaMnlBhcg+ye0zemkUVgvVQP4PKKA8ynHQaV8mB2YNhLx+7glOZ9ruXBbryFR0LZjfntDGvZnhi6eZn21tz3rQr83NSpW8+DmGtoVZtn7OnwhILlRzxen/awnUEmykdArWWZJAnChnIrgPBoWyEpJ55xct8ls0HbNkrjqyGD53SmLkVfBtAv7T4MwlpaHLhE84UOLwfKmvBxOWpdHtcSomXEjyNqHnj+66B4c238+nn953lFvSKjrSbM5z/pUehDCa7Nu4Y+mA3VJhkZkXhv6bAx8b85zklFwIDAQAB"
+}
