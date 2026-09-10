@@ -1,6 +1,9 @@
 (() => {
   "use strict";
 
+  if (globalThis.__ANIMEKAI_RPC_V6_CONTENT__) return;
+  globalThis.__ANIMEKAI_RPC_V6_CONTENT__ = true;
+
   const isAnimeKaiHost = (host = "") => {
     host = String(host).toLowerCase();
     return host === "animekai.be" || host.endsWith(".animekai.be");
