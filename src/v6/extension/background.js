@@ -1,17 +1,17 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.1.4";
+const VERSION = "6.1.5";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.4";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.5";
 const BROWSING_ARTWORK_URLS = {
-  square: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-512x512.png",
-  squareHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-1024x1024.png",
-  classic: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-512x384.png",
-  classicHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-1024x768.png",
-  cinema: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-640x360.png",
-  cinemaHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-1280x720.png",
-  wide: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-640x320.png",
-  wideHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-1280x640.png"
+  square: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-Square-512x512.png",
+  squareHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-Square-1024x1024.png",
+  classic: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-4x3-512x384.png",
+  classicHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-4x3-1024x768.png",
+  cinema: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-16x9-640x360.png",
+  cinemaHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-16x9-1280x720.png",
+  wide: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-2x1-640x320.png",
+  wideHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-2x1-1280x640.png"
 };
 const BROWSING_IMAGE_URL = BROWSING_ARTWORK_URLS.square;
 const DEFAULTS = {
