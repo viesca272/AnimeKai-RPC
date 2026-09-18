@@ -10,18 +10,18 @@ AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Ric
 
 ## V6 is now the official release
 
-AnimeKai RPC **V6.0.0** is the current stable version.
+AnimeKai RPC **V6.1.0** is the current stable version.
 
-V6 rolls together everything that was tested across the V6 alpha builds while keeping the playback/RPC path that proved reliable in V5.
+V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detection, a browsing presence before playback starts, and clearer health checks.
 
 What you get in V6:
 
-- automatic AnimeKai title and episode detection
+- immediate **Browsing AnimeKai** presence when the site opens\n- faster event-first AnimeKai/player detection\n- automatic AnimeKai title and episode detection
 - play, pause, buffering, and timestamp tracking
 - Discord Rich Presence with the public AnimeKai RPC application already configured
 - a small Windows desktop helper for Discord communication
 - **Refresh** / reconnect controls
-- one-click **Repair App**
+- one-click **Repair App** and detailed **Run health check** results
 - first-run setup and helper-version checks
 - optional embedded-player access instead of requiring broad site access during install
 - alternate cover-art recovery through Jikan with local caching
@@ -61,12 +61,12 @@ The extension handles AnimeKai detection. The Windows helper handles the local c
 
 ## Installing V6
 
-1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.0.0-Windows.zip**.
+1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.1.0-Windows.zip**.
 2. Extract the ZIP somewhere permanent.
 3. Run **Install AnimeKai RPC.cmd**.
 4. Load the included `extension` folder in your Chromium-based browser while browser-store publishing is being finalized.
 5. Open the V6 setup guide and enable **Player detection** when prompted.
-6. Open AnimeKai, start an episode, and press **Refresh** once if Discord does not appear immediately.
+6. Open AnimeKai. Discord should show **Browsing AnimeKai** almost immediately, then switch to the normal episode presence when playback begins. **Refresh** remains available as a fallback.
 
 The Discord Application ID is already built in. You do **not** need to create a Discord application or paste an ID anywhere.
 
@@ -90,7 +90,7 @@ If no usable image is available, the RPC can fall back to a clean text-only pres
 
 ## Desktop helper
 
-V6.0.0 includes an updated stable helper with:
+V6.1.0 includes an updated stable helper with:\n\n- browsing Rich Presence with AnimeKai RPC artwork and an elapsed timer\n- protocol v3 health/browsing support
 
 - the bundled AnimeKai RPC Discord Application ID
 - clearer connection errors
