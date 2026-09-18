@@ -27,7 +27,7 @@ jobs:
           node --check src/v6/extension/onboarding.js
 
           $manifest = Get-Content src/v6/extension/manifest.json -Raw | ConvertFrom-Json
-          if ($manifest.version_name -ne "6.1.2") { throw "Manifest version_name is not V6.1.2." }
+          if ($manifest.version_name -ne "6.1.3") { throw "Manifest version_name is not V6.1.3." }
           if ($manifest.host_permissions -contains "<all_urls>") { throw "<all_urls> must not be a required V6.1 host permission." }
           if ($manifest.optional_host_permissions -notcontains "<all_urls>") { throw "Optional player-frame permission is missing." }
 
@@ -36,10 +36,10 @@ jobs:
           if ($content -notmatch 'queueBurst') { throw "Fast startup burst detection is missing." }
 
           $background = Get-Content src/v6/extension/background.js -Raw
-          if ($background -notmatch 'const VERSION = "6\.1\.2"') { throw "Extension background version is not V6.1.2." }
-          if ($background -notmatch 'BROWSING_IMAGE_URL') { throw "Browsing artwork is missing." }
-          if ($background -notmatch 'assets/animekai\.png') { throw "AnimeKai browsing artwork path is missing." }
-          if (!(Test-Path "src/v6/extension/assets/animekai.png")) { throw "AnimeKai browsing artwork file is missing." }
+          if ($background -notmatch 'const VERSION = "6\.1\.2"') { throw "Extension background version is not V6.1.3." }
+          if ($background -notmatch 'BROWSING_ARTWORK_URLS') { throw "Browsing artwork map is missing." }
+          if ($background -notmatch 'AnimeKai-Browsing-2x1-1024x512\.jpg') { throw "2:1 crop-safe browsing artwork is not configured." }
+          if (!(Test-Path "src/v6/extension/assets/animekai.png")) { throw "Source AnimeKai artwork file is missing." }
           if ($background -notmatch 'Checking system health') { throw "Improved health-check state is missing." }
           if ($background -notmatch 'runAt: "document_start"') { throw "Dynamic player detector is not starting early." }
 
@@ -60,10 +60,12 @@ jobs:
         run: |
           python -m py_compile src/v6/native_host/native_host.py
           $text = Get-Content src/v6/native_host/native_host.py -Raw
-          if ($text -notmatch 'HOST_VERSION = "6\.1\.2"') { throw "Native helper version is not V6.1.2." }
+          if ($text -notmatch 'HOST_VERSION = "6\.1\.2"') { throw "Native helper version is not V6.1.3." }
           if ($text -notmatch 'HELPER_CHANNEL = "stable"') { throw "Native helper is not marked stable." }
           if ($text -notmatch 'PROTOCOL_VERSION = 3') { throw "Native helper protocol is not V6.1." }
-          if ($text -notmatch 'BROWSING_ICON_URL') { throw "Native browsing artwork support is missing." }
+          if ($text -notmatch 'BROWSING_ARTWORK_URLS') { throw "Native browsing artwork fallbacks are missing." }
+          if ($text -notmatch 'AnimeKai-Browsing-2x1-1024x512\.jpg') { throw "Native 2:1 browsing artwork is missing." }
+          if ($text -notmatch 'AnimeKai-Browsing-Square-512x512\.jpg') { throw "Native square branding artwork is missing." }
           if ($text -notmatch '"small_image": BROWSING_ICON_URL') { throw "Watching RPC small AnimeKai branding is missing." }
           if ($text -notmatch 'installation_ok') { throw "Detailed health validation is missing." }
           if ($text -notmatch '1543575455523807385') { throw "Bundled Discord Application ID is missing." }
@@ -72,7 +74,101 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "pypresence==4.6.2" "pyinstaller>=6.15,<7"
+          python -m pip install "pillow>=10,<12" "pypresence==4.6.2" "pyinstaller>=6.15,<7"
+
+      - name: Generate crop-safe Discord artwork
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          from PIL import Image
+
+          source = Path("src/v6/extension/assets/animekai.png")
+          package_dir = Path("src/v6/extension/assets/rpc")
+          release_dir = Path("release-artwork")
+          package_dir.mkdir(parents=True, exist_ok=True)
+          release_dir.mkdir(parents=True, exist_ok=True)
+
+          src = Image.open(source).convert("RGB")
+          sw, sh = src.size
+
+          # Rebuild AnimeKai's green background, then isolate the dark K and
+          # light claw marks from the square source image. Extra surrounding
+          # green gives Discord room to crop its wide activity thumbnail.
+          left_rgb = (80, 182, 105)
+          right_rgb = (16, 147, 72)
+
+          source_bg = Image.new("RGB", (sw, sh))
+          bg_pixels = source_bg.load()
+          for x in range(sw):
+              t = x / max(1, sw - 1)
+              color = tuple(round(left_rgb[i] * (1 - t) + right_rgb[i] * t) for i in range(3))
+              for y in range(sh):
+                  bg_pixels[x, y] = color
+
+          src_px = src.load()
+          bg_px = source_bg.load()
+          alpha = Image.new("L", (sw, sh), 0)
+          a_px = alpha.load()
+          for y in range(sh):
+              for x in range(sw):
+                  p = src_px[x, y]
+                  b = bg_px[x, y]
+                  diff = max(abs(p[i] - b[i]) for i in range(3))
+                  # Soft edge keeps antialiasing while dropping the original
+                  # square background.
+                  a_px[x, y] = max(0, min(255, (diff - 18) * 9))
+
+          foreground = src.convert("RGBA")
+          foreground.putalpha(alpha)
+          bbox = alpha.getbbox()
+          if not bbox:
+              raise RuntimeError("Could not isolate AnimeKai artwork.")
+          foreground = foreground.crop(bbox)
+
+          variants = [
+              ("AnimeKai-Browsing-2x1-1024x512.jpg", (1024, 512), 0.72, 0.48),
+              ("AnimeKai-Browsing-16x9-1280x720.jpg", (1280, 720), 0.72, 0.55),
+              ("AnimeKai-Browsing-4x3-1024x768.jpg", (1024, 768), 0.70, 0.66),
+              ("AnimeKai-Browsing-Square-512x512.jpg", (512, 512), 0.72, 0.74),
+          ]
+
+          for name, (tw, th), max_h, max_w in variants:
+              canvas = Image.new("RGB", (tw, th))
+              px = canvas.load()
+              for x in range(tw):
+                  t = x / max(1, tw - 1)
+                  color = tuple(round(left_rgb[i] * (1 - t) + right_rgb[i] * t) for i in range(3))
+                  for y in range(th):
+                      px[x, y] = color
+
+              scale = min(
+                  (th * max_h) / foreground.height,
+                  (tw * max_w) / foreground.width,
+              )
+              fw = max(1, round(foreground.width * scale))
+              fh = max(1, round(foreground.height * scale))
+              fg = foreground.resize((fw, fh), Image.Resampling.LANCZOS)
+
+              x = (tw - fw) // 2
+              y = (th - fh) // 2
+              canvas.paste(fg, (x, y), fg)
+
+              for destination in (package_dir / name, release_dir / name):
+                  canvas.save(destination, "JPEG", quality=90, optimize=True, progressive=True)
+
+          expected = {
+              "AnimeKai-Browsing-2x1-1024x512.jpg": (1024, 512),
+              "AnimeKai-Browsing-16x9-1280x720.jpg": (1280, 720),
+              "AnimeKai-Browsing-4x3-1024x768.jpg": (1024, 768),
+              "AnimeKai-Browsing-Square-512x512.jpg": (512, 512),
+          }
+          for name, size in expected.items():
+              actual = Image.open(release_dir / name).size
+              if actual != size:
+                  raise RuntimeError(f"{name}: expected {size}, got {actual}")
+              print(f"{name}: {actual[0]}x{actual[1]}")
+          '@ | python -
 
       - name: Build desktop helper
         shell: pwsh
@@ -80,11 +176,11 @@ jobs:
           python -m PyInstaller --clean --onefile --console --name AnimeKaiRPCNativeHost src/v6/native_host/native_host.py
           if (!(Test-Path "dist/AnimeKaiRPCNativeHost.exe")) { throw "Native helper build failed." }
 
-      - name: Package V6.1.2
+      - name: Package V6.1.3
         shell: pwsh
         run: |
           $out = "release"
-          $stage = Join-Path $out "AnimeKai-RPC-V6.1.2"
+          $stage = Join-Path $out "AnimeKai-RPC-V6.1.3"
           Remove-Item $out -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $stage | Out-Null
           New-Item -ItemType Directory -Force -Path (Join-Path $stage "native_host") | Out-Null
@@ -93,7 +189,7 @@ jobs:
           Copy-Item "src/v6/extension" (Join-Path $stage "extension") -Recurse
           Copy-Item "dist/AnimeKaiRPCNativeHost.exe" (Join-Path $stage "native_host/AnimeKaiRPCNativeHost.exe")
           Copy-Item "src/v6/windows/Install-Helper.ps1" (Join-Path $stage "windows/Install-Helper.ps1")
-          Copy-Item "docs/V6_1_2_RELEASE_NOTES.md" (Join-Path $stage "README.md")
+          Copy-Item "docs/V6_1_3_RELEASE_NOTES.md" (Join-Path $stage "README.md")
           Copy-Item "LICENSE" (Join-Path $stage "LICENSE") -ErrorAction SilentlyContinue
 
           '@echo off
@@ -108,24 +204,30 @@ jobs:
           cd /d "%~dp0"
           powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference=''SilentlyContinue''; $n=''com.animekai.discordrpc''; foreach($b in @(''HKCU:\Software\Google\Chrome\NativeMessagingHosts'',''HKCU:\Software\Chromium\NativeMessagingHosts'',''HKCU:\Software\Microsoft\Edge\NativeMessagingHosts'')){Remove-Item ($b+''\''+$n) -Recurse -Force}; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\AnimeKaiRPCNativeHost.exe'') -Force; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\com.animekai.discordrpc.json'') -Force; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\install-info.json'') -Force"' | Set-Content (Join-Path $stage "Uninstall AnimeKai RPC.cmd") -Encoding ASCII
 
-          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.2-Windows.zip") -CompressionLevel Optimal
-          Compress-Archive -Path "src/v6/extension/*" -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.2-Extension.zip") -CompressionLevel Optimal
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.3-Windows.zip") -CompressionLevel Optimal
+          Compress-Archive -Path "src/v6/extension/*" -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.3-Extension.zip") -CompressionLevel Optimal
 
-          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.2-Windows.zip") -Algorithm SHA256 | Format-List
-          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.2-Extension.zip") -Algorithm SHA256 | Format-List
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.3-Windows.zip") -Algorithm SHA256 | Format-List
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.3-Extension.zip") -Algorithm SHA256 | Format-List
 
       - name: Publish stable GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v6.1.2"
-          $windows = "release/AnimeKai-RPC-V6.1.2-Windows.zip"
-          $extension = "release/AnimeKai-RPC-V6.1.2-Extension.zip"
+          $tag = "v6.1.3"
+          $windows = "release/AnimeKai-RPC-V6.1.3-Windows.zip"
+          $extension = "release/AnimeKai-RPC-V6.1.3-Extension.zip"
+          $artwork = @(
+            "release-artwork/AnimeKai-Browsing-2x1-1024x512.jpg",
+            "release-artwork/AnimeKai-Browsing-16x9-1280x720.jpg",
+            "release-artwork/AnimeKai-Browsing-4x3-1024x768.jpg",
+            "release-artwork/AnimeKai-Browsing-Square-512x512.jpg"
+          )
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag $windows $extension --clobber
-            gh release edit $tag --title "AnimeKai RPC V6.1.2" --notes-file "docs/V6_1_2_RELEASE_NOTES.md" --prerelease=false --latest
+            gh release upload $tag $windows $extension @artwork --clobber
+            gh release edit $tag --title "AnimeKai RPC V6.1.3" --notes-file "docs/V6_1_3_RELEASE_NOTES.md" --prerelease=false --latest
           } else {
-            gh release create $tag $windows $extension --target $env:GITHUB_SHA --title "AnimeKai RPC V6.1.2" --notes-file "docs/V6_1_2_RELEASE_NOTES.md" --latest
+            gh release create $tag $windows $extension @artwork --target $env:GITHUB_SHA --title "AnimeKai RPC V6.1.3" --notes-file "docs/V6_1_3_RELEASE_NOTES.md" --latest
           }
