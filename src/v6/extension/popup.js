@@ -148,9 +148,12 @@ function render(s) {
       $("time").textContent = `${fmt(d.position)} / ${fmt(d.duration)}`;
       $("fill").style.width = d.duration ? `${Math.min(100, d.position / d.duration * 100)}%` : "0%";
     }
-    if (d.image) {
+    if (browsing) {
+      $("cover").src = chrome.runtime.getURL("assets/rpc/AnimeKai-Browsing-Square-512x512.png");
+      $("cover").onerror = null;
+    } else if (d.image) {
       $("cover").src = d.image;
-      $("cover").onerror = browsing ? null : () => chrome.runtime.sendMessage({type:"coverFailed", title:d.title, url:d.image});
+      $("cover").onerror = () => chrome.runtime.sendMessage({type:"coverFailed", title:d.title, url:d.image});
     }
   } else {
     $("anime").textContent = "Nothing detected";
@@ -290,7 +293,7 @@ async function enablePlayerAccess() {
 }
 
 function openSetupRelease() {
-  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.4"});
+  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.5"});
 }
 
 $("accent").oninput = e => { $("hex").value = e.target.value; saveAppearance(); };
