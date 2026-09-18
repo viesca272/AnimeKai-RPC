@@ -36,16 +36,16 @@ jobs:
           if ($content -notmatch 'queueBurst') { throw "Fast startup burst detection is missing." }
 
           $background = Get-Content src/v6/extension/background.js -Raw
-          if ($background -notmatch 'const VERSION = "6\.1\.4"') { throw "Extension background version is not V6.1.5." }
+          if ($background -notmatch 'const VERSION = "6\.1\.5"') { throw "Extension background version is not V6.1.5." }
           if ($background -notmatch 'BROWSING_ARTWORK_URLS') { throw "Browsing artwork map is missing." }
           if ($background -notmatch 'AnimeKai-Browsing-Square-512x512\.png') { throw "Square PNG browsing artwork is not configured." }
           if ($background -match 'AnimeKai-Browsing-[^"]+\.jpg') { throw "Legacy JPEG browsing artwork reference is still present." }
           if (!(Test-Path "src/v6/extension/assets/animekai-clean.webp.b64")) { throw "Clean AnimeKai artwork seed is missing." }
-          if ($popup -notmatch 'assets/rpc/AnimeKai-Browsing-Square-512x512\.png') { throw "Popup is not using packaged browsing artwork." }
           if ($background -notmatch 'Checking system health') { throw "Improved health-check state is missing." }
           if ($background -notmatch 'runAt: "document_start"') { throw "Dynamic player detector is not starting early." }
 
           $popup = Get-Content src/v6/extension/popup.js -Raw
+          if ($popup -notmatch 'assets/rpc/AnimeKai-Browsing-Square-512x512\.png') { throw "Popup is not using packaged browsing artwork." }
           if ($popup -notmatch 'Native Messaging manifest') { throw "Detailed health results are missing from popup." }
 
           foreach($icon in @("icon16.png","icon32.png","icon48.png","icon128.png")) {
@@ -62,7 +62,7 @@ jobs:
         run: |
           python -m py_compile src/v6/native_host/native_host.py
           $text = Get-Content src/v6/native_host/native_host.py -Raw
-          if ($text -notmatch 'HOST_VERSION = "6\.1\.4"') { throw "Native helper version is not V6.1.5." }
+          if ($text -notmatch 'HOST_VERSION = "6\.1\.5"') { throw "Native helper version is not V6.1.5." }
           if ($text -notmatch 'HELPER_CHANNEL = "stable"') { throw "Native helper is not marked stable." }
           if ($text -notmatch 'PROTOCOL_VERSION = 3') { throw "Native helper protocol is not V6.1." }
           if ($text -notmatch 'BROWSING_ARTWORK_URLS') { throw "Native browsing artwork fallbacks are missing." }
