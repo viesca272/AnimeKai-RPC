@@ -1,7 +1,7 @@
 param([switch]$Repair)
 $ErrorActionPreference = "Stop"
 
-$Version = "6.1.5"
+$Version = "6.1.6"
 $Channel = "stable"
 $Root = Split-Path -Parent $PSScriptRoot
 $SourceExe = Join-Path $Root "native_host\AnimeKaiRPCNativeHost.exe"
