@@ -1,9 +1,9 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.1.1";
+const VERSION = "6.1.2";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.1";
-const BROWSING_IMAGE_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.2";
+const BROWSING_IMAGE_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/v6.1.2/src/v6/extension/assets/animekai.png";
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
