@@ -10,11 +10,11 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.0.0"
+HOST_VERSION = "6.1.0"
 HELPER_CHANNEL = "stable"
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
-PUBLISHER_CLIENT_ID = "1543575455523807385"
+PUBLISHER_CLIENT_ID = "1543575455523807385"\nBROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
@@ -37,6 +37,8 @@ last_rpc_update = None
 started = None
 paused_at = None
 last_url = ""
+last_kind = None
+browsing_started = None
 artwork_rejected = False
 
 
@@ -182,6 +184,7 @@ def templ(t, d, status_text):
 def activity(d, settings=None, override=None):
     global started, paused_at, last_url, last_error, last_variant
     global last_rpc_update, discord_connected, artwork_rejected
+    global last_kind, browsing_started
 
     c = cfg()
     c.update({k: v for k, v in (settings or {}).items() if v is not None})
@@ -192,6 +195,62 @@ def activity(d, settings=None, override=None):
         return
 
     now = time.time()
+    kind = str(d.get("kind") or "watching").lower()
+
+    if kind == "browsing":
+        if last_kind != "browsing" or browsing_started is None:
+            browsing_started = now
+        last_kind = "browsing"
+        started = None
+        paused_at = None
+        last_url = str(d.get("url") or "https://animekai.be/")
+
+        base = {
+            "details": str(d.get("details") or "Browsing AnimeKai")[:128],
+            "state": str(d.get("browseState") or "Finding something to watch")[:128],
+        }
+        if c.get("showTimestamp", True) and browsing_started is not None:
+            base["start"] = int(browsing_started * 1000)
+
+        full = dict(base)
+        image = str(d.get("image") or BROWSING_ICON_URL)
+        if image.startswith(("http://", "https://")):
+            full.update({
+                "large_image": image,
+                "large_text": "AnimeKai",
+            })
+        full["buttons"] = [{"label": "Open AnimeKai", "url": str(d.get("url") or "https://animekai.be/")[:512]}]
+
+        try:
+            rpc.update(**full)
+            last_variant = "browsing"
+            last_error = None
+            last_rpc_update = int(time.time() * 1000)
+            artwork_rejected = False
+            status()
+            return
+        except Exception as e:
+            last_error = friendly_error(e)
+            artwork_rejected = True
+            log("Browsing RPC with artwork failed: " + repr(e))
+
+        try:
+            rpc.update(**base)
+            last_variant = "browsing-minimal"
+            last_error = None
+            last_rpc_update = int(time.time() * 1000)
+            discord_connected = True
+            status()
+            return
+        except Exception as e:
+            last_error = friendly_error(e)
+            discord_connected = False
+            log("Browsing minimal RPC failed: " + repr(e))
+            status(last_error)
+            return
+
+    last_kind = "watching"
+    browsing_started = None
     mode = str(c.get("playbackMode") or "auto").lower()
     state = override or (mode if mode in ("playing", "paused") else str(d.get("state") or "paused"))
     pos = max(0, float(d.get("position") or 0))
@@ -266,7 +325,7 @@ def activity(d, settings=None, override=None):
 
 
 def clear():
-    global started, paused_at, last_url, last_rpc_update
+    global started, paused_at, last_url, last_rpc_update, last_kind, browsing_started
     try:
         if rpc and discord_connected:
             rpc.clear()
@@ -275,6 +334,8 @@ def clear():
     started = None
     paused_at = None
     last_url = ""
+    last_kind = None
+    browsing_started = None
     last_rpc_update = int(time.time() * 1000)
 
 
@@ -304,13 +365,27 @@ def registry_locations():
     ]
 
 
+def manifest_is_valid():
+    try:
+        data = json.loads(MANIFEST_FILE.read_text(encoding="utf-8-sig"))
+        origins = data.get("allowed_origins") or []
+        return (
+            data.get("name") == HOST_NAME
+            and data.get("type") == "stdio"
+            and Path(str(data.get("path") or "")).resolve() == current_executable()
+            and f"chrome-extension://{DEV_EXTENSION_ID}/" in origins
+        )
+    except Exception:
+        return False
+
+
 def health_snapshot():
     out = {
         "version": HOST_VERSION,
         "channel": HELPER_CHANNEL,
         "protocol": PROTOCOL_VERSION,
         "platform": sys.platform,
-        "manifest": MANIFEST_FILE.exists(),
+        "manifest": manifest_is_valid(),
         "executable": current_executable().exists(),
         "config": CONFIG_FILE.exists(),
         "install_info": INSTALL_INFO_FILE.exists(),
@@ -326,6 +401,15 @@ def health_snapshot():
                     out["registry"][key] = winreg.QueryValueEx(k, None)[0] == str(MANIFEST_FILE)
             except OSError:
                 out["registry"][key] = False
+    out["registry_ok"] = bool(out["registry"]) and all(out["registry"].values())
+    out["installation_ok"] = bool(
+        out["manifest"]
+        and out["executable"]
+        and out["config"]
+        and out["install_info"]
+        and out["client_id"]
+        and out["registry_ok"]
+    )
     return out
 
 
@@ -377,12 +461,16 @@ def main():
         try:
             t = m.get("type")
             if t == "config":
-                c = cfg()
+                previous = cfg()
+                c = dict(previous)
                 c.update(m.get("config") or {})
                 if not str(c.get("client_id") or "").strip():
                     c["client_id"] = PUBLISHER_CLIENT_ID
                 save(c)
-                reconnect_rpc()
+                if str(previous.get("client_id") or "") != str(c.get("client_id") or ""):
+                    reconnect_rpc()
+                else:
+                    ensure_rpc()
                 status(None if discord_connected else last_error)
             elif t == "activity":
                 activity(m.get("data") or {}, m.get("settings"))
@@ -401,11 +489,16 @@ def main():
                     "duration": 300,
                 }, m.get("settings"))
             elif t == "health":
+                ensure_rpc()
                 h = health_snapshot()
+                installation_ok = bool(h.get("installation_ok"))
+                runtime_ok = bool(h.get("discord"))
                 send({
                     "type": "health",
-                    "ok": bool(h.get("client_id")) and bool(h.get("discord")) and (all(h.get("registry", {}).values()) if sys.platform.startswith("win") else False),
-                    "summary": "Health check complete",
+                    "ok": installation_ok and runtime_ok,
+                    "installationOk": installation_ok,
+                    "runtimeOk": runtime_ok,
+                    "summary": "System health check complete",
                     "health": h,
                 })
             elif t == "repair":
