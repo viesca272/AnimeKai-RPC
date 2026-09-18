@@ -33,7 +33,7 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [x] Avoid unnecessary RPC reconnects for appearance-only changes
 - [x] Expand Run health check into per-component results
 - [x] Distinguish a healthy install with Discord closed from an installation problem
-- [x] Update desktop helper to 6.1.3 / protocol v3
+- [x] Update desktop helper to 6.1.4 / protocol v3
 
 ## Next V6 updates
 
@@ -62,4 +62,4 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [ ] Add a smoother one-click update experience for the helper
 - [ ] Test installer/uninstaller on clean Windows accounts
 
-V6.1.3 is the current stable GitHub release. V5 stays available as the legacy fallback build.
+V6.1.4 is the current stable GitHub release. V5 stays available as the legacy fallback build.
