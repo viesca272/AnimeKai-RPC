@@ -10,12 +10,12 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.1.1"
+HOST_VERSION = "6.1.2"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 PUBLISHER_CLIENT_ID = "1543575455523807385"
-BROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png"
+BROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/v6.1.2/src/v6/extension/assets/animekai.png"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
@@ -294,12 +294,14 @@ def activity(d, settings=None, override=None):
         full.update({
             "large_image": image,
             "large_text": str(d.get("title") or "AnimeKai")[:128],
+            "small_image": BROWSING_ICON_URL,
+            "small_text": "Watching on AnimeKai",
         })
     full["buttons"] = [{"label": "Watch on AnimeKai", "url": url[:512]}]
 
     try:
         rpc.update(**full)
-        last_variant = "dynamic"
+        last_variant = "dynamic-branded"
         last_error = None
         last_rpc_update = int(time.time() * 1000)
         artwork_rejected = False
@@ -307,8 +309,27 @@ def activity(d, settings=None, override=None):
         return
     except Exception as e:
         last_error = friendly_error(e)
-        artwork_rejected = bool(image)
-        log("Dynamic RPC failed: " + repr(e))
+        log("Branded dynamic RPC failed: " + repr(e))
+
+    if image.startswith(("http://", "https://")):
+        cover_only = dict(base)
+        cover_only.update({
+            "large_image": image,
+            "large_text": str(d.get("title") or "AnimeKai")[:128],
+            "buttons": [{"label": "Watch on AnimeKai", "url": url[:512]}],
+        })
+        try:
+            rpc.update(**cover_only)
+            last_variant = "dynamic"
+            last_error = None
+            last_rpc_update = int(time.time() * 1000)
+            artwork_rejected = False
+            status()
+            return
+        except Exception as e:
+            last_error = friendly_error(e)
+            artwork_rejected = True
+            log("Cover-only RPC failed: " + repr(e))
 
     try:
         rpc.update(**base)
