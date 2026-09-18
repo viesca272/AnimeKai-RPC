@@ -10,7 +10,7 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.1.0"
+HOST_VERSION = "6.1.1"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
