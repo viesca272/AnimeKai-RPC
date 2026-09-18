@@ -27,7 +27,7 @@ jobs:
           node --check src/v6/extension/onboarding.js
 
           $manifest = Get-Content src/v6/extension/manifest.json -Raw | ConvertFrom-Json
-          if ($manifest.version_name -ne "6.1.1") { throw "Manifest version_name is not V6.1.1." }
+          if ($manifest.version_name -ne "6.1.2") { throw "Manifest version_name is not V6.1.2." }
           if ($manifest.host_permissions -contains "<all_urls>") { throw "<all_urls> must not be a required V6.1 host permission." }
           if ($manifest.optional_host_permissions -notcontains "<all_urls>") { throw "Optional player-frame permission is missing." }
 
@@ -36,8 +36,10 @@ jobs:
           if ($content -notmatch 'queueBurst') { throw "Fast startup burst detection is missing." }
 
           $background = Get-Content src/v6/extension/background.js -Raw
-          if ($background -notmatch 'const VERSION = "6\.1\.1"') { throw "Extension background version is not V6.1.1." }
+          if ($background -notmatch 'const VERSION = "6\.1\.1"') { throw "Extension background version is not V6.1.2." }
           if ($background -notmatch 'BROWSING_IMAGE_URL') { throw "Browsing artwork is missing." }
+          if ($background -notmatch 'assets/animekai\.png') { throw "AnimeKai browsing artwork path is missing." }
+          if (!(Test-Path "src/v6/extension/assets/animekai.png")) { throw "AnimeKai browsing artwork file is missing." }
           if ($background -notmatch 'Checking system health') { throw "Improved health-check state is missing." }
           if ($background -notmatch 'runAt: "document_start"') { throw "Dynamic player detector is not starting early." }
 
@@ -58,10 +60,11 @@ jobs:
         run: |
           python -m py_compile src/v6/native_host/native_host.py
           $text = Get-Content src/v6/native_host/native_host.py -Raw
-          if ($text -notmatch 'HOST_VERSION = "6\.1\.1"') { throw "Native helper version is not V6.1.1." }
+          if ($text -notmatch 'HOST_VERSION = "6\.1\.1"') { throw "Native helper version is not V6.1.2." }
           if ($text -notmatch 'HELPER_CHANNEL = "stable"') { throw "Native helper is not marked stable." }
           if ($text -notmatch 'PROTOCOL_VERSION = 3') { throw "Native helper protocol is not V6.1." }
           if ($text -notmatch 'BROWSING_ICON_URL') { throw "Native browsing artwork support is missing." }
+          if ($text -notmatch '"small_image": BROWSING_ICON_URL') { throw "Watching RPC small AnimeKai branding is missing." }
           if ($text -notmatch 'installation_ok') { throw "Detailed health validation is missing." }
           if ($text -notmatch '1543575455523807385') { throw "Bundled Discord Application ID is missing." }
 
@@ -77,11 +80,11 @@ jobs:
           python -m PyInstaller --clean --onefile --console --name AnimeKaiRPCNativeHost src/v6/native_host/native_host.py
           if (!(Test-Path "dist/AnimeKaiRPCNativeHost.exe")) { throw "Native helper build failed." }
 
-      - name: Package V6.1.1
+      - name: Package V6.1.2
         shell: pwsh
         run: |
           $out = "release"
-          $stage = Join-Path $out "AnimeKai-RPC-V6.1.1"
+          $stage = Join-Path $out "AnimeKai-RPC-V6.1.2"
           Remove-Item $out -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $stage | Out-Null
           New-Item -ItemType Directory -Force -Path (Join-Path $stage "native_host") | Out-Null
@@ -90,7 +93,7 @@ jobs:
           Copy-Item "src/v6/extension" (Join-Path $stage "extension") -Recurse
           Copy-Item "dist/AnimeKaiRPCNativeHost.exe" (Join-Path $stage "native_host/AnimeKaiRPCNativeHost.exe")
           Copy-Item "src/v6/windows/Install-Helper.ps1" (Join-Path $stage "windows/Install-Helper.ps1")
-          Copy-Item "docs/V6_1_1_RELEASE_NOTES.md" (Join-Path $stage "README.md")
+          Copy-Item "docs/V6_1_2_RELEASE_NOTES.md" (Join-Path $stage "README.md")
           Copy-Item "LICENSE" (Join-Path $stage "LICENSE") -ErrorAction SilentlyContinue
 
           '@echo off
@@ -105,24 +108,24 @@ jobs:
           cd /d "%~dp0"
           powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference=''SilentlyContinue''; $n=''com.animekai.discordrpc''; foreach($b in @(''HKCU:\Software\Google\Chrome\NativeMessagingHosts'',''HKCU:\Software\Chromium\NativeMessagingHosts'',''HKCU:\Software\Microsoft\Edge\NativeMessagingHosts'')){Remove-Item ($b+''\''+$n) -Recurse -Force}; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\AnimeKaiRPCNativeHost.exe'') -Force; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\com.animekai.discordrpc.json'') -Force; Remove-Item (Join-Path $env:LOCALAPPDATA ''AnimeKaiRPC\install-info.json'') -Force"' | Set-Content (Join-Path $stage "Uninstall AnimeKai RPC.cmd") -Encoding ASCII
 
-          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.1-Windows.zip") -CompressionLevel Optimal
-          Compress-Archive -Path "src/v6/extension/*" -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.1-Extension.zip") -CompressionLevel Optimal
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.2-Windows.zip") -CompressionLevel Optimal
+          Compress-Archive -Path "src/v6/extension/*" -DestinationPath (Join-Path $out "AnimeKai-RPC-V6.1.2-Extension.zip") -CompressionLevel Optimal
 
-          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.1-Windows.zip") -Algorithm SHA256 | Format-List
-          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.1-Extension.zip") -Algorithm SHA256 | Format-List
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.2-Windows.zip") -Algorithm SHA256 | Format-List
+          Get-FileHash (Join-Path $out "AnimeKai-RPC-V6.1.2-Extension.zip") -Algorithm SHA256 | Format-List
 
       - name: Publish stable GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "v6.1.1"
-          $windows = "release/AnimeKai-RPC-V6.1.1-Windows.zip"
-          $extension = "release/AnimeKai-RPC-V6.1.1-Extension.zip"
+          $tag = "v6.1.2"
+          $windows = "release/AnimeKai-RPC-V6.1.2-Windows.zip"
+          $extension = "release/AnimeKai-RPC-V6.1.2-Extension.zip"
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag $windows $extension --clobber
-            gh release edit $tag --title "AnimeKai RPC V6.1.1" --notes-file "docs/V6_1_1_RELEASE_NOTES.md" --prerelease=false --latest
+            gh release edit $tag --title "AnimeKai RPC V6.1.2" --notes-file "docs/V6_1_2_RELEASE_NOTES.md" --prerelease=false --latest
           } else {
-            gh release create $tag $windows $extension --target $env:GITHUB_SHA --title "AnimeKai RPC V6.1.1" --notes-file "docs/V6_1_1_RELEASE_NOTES.md" --latest
+            gh release create $tag $windows $extension --target $env:GITHUB_SHA --title "AnimeKai RPC V6.1.2" --notes-file "docs/V6_1_2_RELEASE_NOTES.md" --latest
           }
