@@ -1,11 +1,11 @@
 # AnimeKai RPC V6
 
-**Status:** Stable — 6.1.0  
+**Status:** Stable — 6.1.1  
 **Made by viesca27**
 
-V6.1.0 is the current stable AnimeKai RPC release. It keeps the proven V6 playback/RPC path and adds polish around browsing presence, faster state transitions, and health reporting.
+V6.1.1 is the current stable AnimeKai RPC release. It keeps the proven V6 playback/RPC path and adds polish around browsing presence, faster state transitions, and health reporting.
 
-## Included in V6.1.0
+## Included in V6.1.1
 
 - Built-in public Discord Application ID — no Discord developer setup required
 - V5-style extension icon
@@ -36,7 +36,7 @@ The official V6 presets use gradients instead of flat backgrounds:
 
 Manual background/card color changes switch the appearance to a flat **Custom** theme so users can choose exact colors without fighting the preset gradient.
 
-## Desktop helper 6.1.0
+## Desktop helper 6.1.1
 
 The stable helper supports browsing Rich Presence, protocol v3 health reporting, clearer install-vs-runtime health status, manifest validation, reduced unnecessary reconnects, install metadata, and the existing Repair App behavior.
 
