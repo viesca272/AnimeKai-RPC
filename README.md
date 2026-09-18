@@ -80,7 +80,7 @@ You will need:
 
 ### 1. Download and extract AnimeKai RPC
 
-1. Open the latest GitHub Release.
+1. Open the [latest GitHub Release](https://github.com/viesca272/AnimeKai-RPC/releases/latest).
 2. Download **AnimeKai-RPC-V6.1.3-Windows.zip**.
 3. Right-click the ZIP and choose **Extract All**, or extract it with your preferred archive program.
 4. Move the extracted folder somewhere you plan to keep it, such as your Documents folder.
