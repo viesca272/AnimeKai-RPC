@@ -19,6 +19,20 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [x] Improve helper connection errors and initial reconnect behavior
 - [x] Publish stable V6.0.0 release and migration notes
 
+## V6.1.0 polish milestone
+
+- [x] Add **Browsing AnimeKai** presence before playback starts
+- [x] Use AnimeKai RPC artwork for the browsing presence
+- [x] Add browsing elapsed time
+- [x] Move AnimeKai detection to document_start
+- [x] Add route/player startup detection bursts
+- [x] Listen to player events for immediate state changes
+- [x] Clear stale player frames on route changes
+- [x] Avoid unnecessary RPC reconnects for appearance-only changes
+- [x] Expand Run health check into per-component results
+- [x] Distinguish a healthy install with Discord closed from an installation problem
+- [x] Update desktop helper to 6.1.0 / protocol v3
+
 ## Next V6 updates
 
 - [ ] Add theme import/export
@@ -46,4 +60,4 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [ ] Add a smoother one-click update experience for the helper
 - [ ] Test installer/uninstaller on clean Windows accounts
 
-V6.0.0 is the current stable GitHub release. V5 stays available as the legacy fallback build.
+V6.1.0 is the current stable GitHub release. V5 stays available as the legacy fallback build.
