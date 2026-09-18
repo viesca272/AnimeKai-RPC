@@ -1,8 +1,8 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.0.0";
+const VERSION = "6.1.0";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.0";\nconst BROWSING_IMAGE_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png";
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
@@ -142,7 +142,7 @@ function onNativeMessage(msg) {
     state.lastError = msg.lastError || msg.error || null;
     if (msg.artworkRejected && current?.title) resolveAlternateCover(current.title, current.image, true);
   } else if (msg?.type === "health") {
-    state.repair = {kind:"health", ...msg};
+    state.repair = {kind:"health", pending:false, ...msg};
   } else if (msg?.type === "repairResult") {
     state.repair = {kind:"repair", ...msg};
   } else if (msg?.type === "error") {
@@ -191,6 +191,21 @@ function merge(tabId, frameId, data) {
   pages.set(tabId, page);
   if (!page.top?.title) return;
 
+  if (page.top.kind === "browsing") {
+    current = {
+      ...page.top,
+      state:"browsing",
+      position:0,
+      duration:0,
+      image:BROWSING_IMAGE_URL
+    };
+    delete current.media;
+    state.lastUpdate = Date.now();
+    sendActivity(false);
+    broadcast();
+    return;
+  }
+
   const candidates = [];
   for (const frame of page.frames.values()) if (frame?.media) candidates.push(frame.media);
   candidates.sort((a,b)=>scoreMedia(b)-scoreMedia(a));
@@ -206,7 +221,8 @@ function merge(tabId, frameId, data) {
 function activitySig() {
   if (!current) return "";
   return JSON.stringify({
-    title:current.title, episode:current.episode, total:current.total,
+    kind:current.kind, title:current.title, details:current.details, browseState:current.browseState,
+    episode:current.episode, total:current.total,
     state:current.state, p:Math.floor(current.position||0), d:Math.floor(current.duration||0),
     image:current.image, mode:settings.playbackMode, ts:settings.showTimestamp,
     details:settings.detailsTemplate, line:settings.stateTemplate
@@ -286,18 +302,39 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "setSettings") {
     const incoming = {...(msg.settings||{})};
     delete incoming.client_id;
+    const beforeNative = JSON.stringify(nativeConfig());
     settings = {...settings, ...incoming, client_id:PUBLISHER_CLIENT_ID};
     chrome.storage.local.set(settings);
     state.settings = settings;
-    sendNative({type:"config", config:nativeConfig()});
-    sendActivity(true); broadcast(); sendResponse({ok:true}); return true;
+    const nativeChanged = beforeNative !== JSON.stringify(nativeConfig());
+    if (nativeChanged) sendNative({type:"config", config:nativeConfig()});
+    if (nativeChanged) sendActivity(true);
+    broadcast(); sendResponse({ok:true}); return true;
   }
   if (msg.type === "syncPlayerAccess") { syncPlayerAccess().then(()=>sendResponse({ok:true,playerAccess:state.playerAccess})); return true; }
   if (msg.type === "refresh") { refreshNow().then(()=>sendResponse({ok:true})).catch(e=>sendResponse({ok:false,error:e.message})); return true; }
   if (msg.type === "test") { sendNative({type:"test", settings:nativeConfig()}); sendResponse({ok:true}); return true; }
   if (msg.type === "clear") { current=null; sendNative({type:"clear"}); broadcast(); sendResponse({ok:true}); return true; }
   if (msg.type === "coverFailed") { resolveAlternateCover(msg.title, msg.url, true); sendResponse({ok:true}); return true; }
-  if (msg.type === "health") { sendNative({type:"health"}); sendResponse({ok:true}); return true; }
+  if (msg.type === "health") {
+    const startedAt = Date.now();
+    state.repair = {kind:"health", pending:true, startedAt, summary:"Checking system health…"};
+    broadcast();
+    const sent = sendNative({type:"health"});
+    if (!sent) {
+      state.repair = {kind:"health", pending:false, ok:false, installationOk:false, runtimeOk:false, summary:"Desktop helper is unavailable."};
+      broadcast();
+      sendResponse({ok:false});
+      return true;
+    }
+    setTimeout(() => {
+      if (state.repair?.kind === "health" && state.repair?.pending && state.repair?.startedAt === startedAt) {
+        state.repair = {kind:"health", pending:false, ok:false, installationOk:false, runtimeOk:false, summary:"Desktop helper did not answer the health check."};
+        broadcast();
+      }
+    }, 1800);
+    sendResponse({ok:true}); return true;
+  }
   if (msg.type === "repair") { sendNative({type:"repair"}); sendResponse({ok:true}); return true; }
   if (msg.type === "copyDiagnostics") {
     const d = current;
@@ -319,6 +356,65 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-chrome.tabs.onRemoved.addListener(tabId=>{pages.delete(tabId);if(!pages.size){current=null;sendNative({type:"clear"});}});
+function isAnimeKaiUrl(url="") {
+  try {
+    const u = new URL(url);
+    return u.hostname === "animekai.be" || u.hostname.endsWith(".animekai.be");
+  } catch { return false; }
+}
+
+function browseStateForUrl(url="") {
+  try {
+    const u = new URL(url);
+    const searching = /\\/search(?:\\/|$)/i.test(u.pathname)
+      || ["q","query","keyword","search"].some(k => u.searchParams.has(k));
+    return searching ? "Searching for something to watch" : "Finding something to watch";
+  } catch {
+    return "Finding something to watch";
+  }
+}
+
+function primeBrowsing(tabId, url) {
+  if (!tabId || !isAnimeKaiUrl(url)) return;
+  const page = pages.get(tabId) || {top:null, frames:new Map()};
+  page.top = {
+    role:"top",
+    kind:"browsing",
+    url,
+    title:"AnimeKai",
+    details:"Browsing AnimeKai",
+    browseState:browseStateForUrl(url),
+    image:"",
+    media:{found:false,state:"browsing",position:0,duration:0,source:url},
+    timestamp:Date.now()
+  };
+  pages.set(tabId, page);
+  merge(tabId, 0, page.top);
+}
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  const url = changeInfo.url || tab.url || "";
+  if (url && !isAnimeKaiUrl(url)) {
+    const had = pages.delete(tabId);
+    if (had && !pages.size) {
+      current = null;
+      sendNative({type:"clear"});
+      broadcast();
+    }
+    return;
+  }
+  if (isAnimeKaiUrl(url) && (changeInfo.url || changeInfo.status === "loading")) {
+    primeBrowsing(tabId, url);
+  }
+});
+
+chrome.tabs.onRemoved.addListener(tabId=>{
+  pages.delete(tabId);
+  if(!pages.size){
+    current=null;
+    sendNative({type:"clear"});
+    broadcast();
+  }
+});
 init();
 setInterval(()=>{connectNative();sendActivity(false);},5000);
