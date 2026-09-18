@@ -1,15 +1,18 @@
 # AnimeKai RPC V6
 
-**Status:** Stable — 6.1.1  
+**Status:** Stable — 6.1.2  
 **Made by viesca27**
 
-V6.1.1 is the current stable AnimeKai RPC release. It keeps the proven V6 playback/RPC path and adds polish around browsing presence, faster state transitions, and health reporting.
+V6.1.2 is the current stable AnimeKai RPC release. It keeps the proven V6 playback/RPC path and adds polish around browsing presence, faster state transitions, and health reporting.
 
-## Included in V6.1.1
+## Included in V6.1.2
 
 - Built-in public Discord Application ID — no Discord developer setup required
 - V5-style extension icon
-- Immediate **Browsing AnimeKai** Rich Presence with AnimeKai RPC artwork\n- Event-first detection with route/player startup bursts\n- Refresh / reconnect control
+- Immediate **Browsing AnimeKai** Rich Presence with the actual AnimeKai artwork
+- Anime cover art while watching with a small AnimeKai branding icon when supported
+- Event-first detection with route/player startup bursts
+- Refresh / reconnect control
 - First-run setup guide
 - Required host access limited to AnimeKai + Jikan
 - Optional third-party player-frame access for embedded playback detection
@@ -36,7 +39,7 @@ The official V6 presets use gradients instead of flat backgrounds:
 
 Manual background/card color changes switch the appearance to a flat **Custom** theme so users can choose exact colors without fighting the preset gradient.
 
-## Desktop helper 6.1.1
+## Desktop helper 6.1.2
 
 The stable helper supports browsing Rich Presence, protocol v3 health reporting, clearer install-vs-runtime health status, manifest validation, reduced unnecessary reconnects, install metadata, and the existing Repair App behavior.
 
