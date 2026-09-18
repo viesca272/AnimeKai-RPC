@@ -76,6 +76,7 @@ $config | ConvertTo-Json | Set-Content -Path $configFile -Encoding UTF8
 $installInfoObject = [ordered]@{
   version = $Version
   channel = $Channel
+  protocol = 3
   installed_at = (Get-Date).ToUniversalTime().ToString("o")
   helper_path = $InstalledExe
   manifest_path = $Manifest
