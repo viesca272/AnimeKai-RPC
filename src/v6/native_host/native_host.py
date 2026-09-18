@@ -10,22 +10,24 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.1.5"
+HOST_VERSION = "6.1.6"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 PUBLISHER_CLIENT_ID = "1543575455523807385"
 BROWSING_ARTWORK_URLS = [
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-Square-512x512.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-Square-1024x1024.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-4x3-512x384.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-4x3-1024x768.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-16x9-640x360.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-16x9-1280x720.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-2x1-640x320.png",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.5/AnimeKai-Browsing-2x1-1280x640.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-Square-512x512.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-Square-1024x1024.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-4x3-512x384.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-4x3-1024x768.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-16x9-640x360.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-16x9-1280x720.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-2x1-640x320.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Browsing-2x1-1280x640.png",
 ]
 BROWSING_ICON_URL = BROWSING_ARTWORK_URLS[0]
+PLAY_ICON_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Playback-Play-256x256.png"
+PAUSE_ICON_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.6/AnimeKai-Playback-Pause-256x256.png"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
@@ -307,11 +309,21 @@ def activity(d, settings=None, override=None):
     image = d.get("image") if isinstance(d.get("image"), str) else ""
     full = dict(base)
     if image.startswith(("http://", "https://")):
+        if state == "playing":
+            playback_icon = PLAY_ICON_URL
+            playback_text = "Playing"
+        elif state == "paused":
+            playback_icon = PAUSE_ICON_URL
+            playback_text = "Paused"
+        else:
+            playback_icon = BROWSING_ICON_URL
+            playback_text = status_text
+
         full.update({
             "large_image": image,
             "large_text": str(d.get("title") or "AnimeKai")[:128],
-            "small_image": BROWSING_ICON_URL,
-            "small_text": "Watching on AnimeKai",
+            "small_image": playback_icon,
+            "small_text": playback_text,
         })
     full["buttons"] = [{"label": "Watch on AnimeKai", "url": url[:512]}]
 
