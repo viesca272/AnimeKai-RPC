@@ -133,15 +133,24 @@ function render(s) {
     : (s.lastError || "Desktop helper missing");
 
   const d = s.current;
+  const browsing = d?.kind === "browsing";
   if (d) {
-    $("anime").textContent = d.title || "Anime";
-    $("episode").textContent = `Episode ${d.episode ?? "—"}${d.total ? ` / ${d.total}` : ""}`;
-    $("playback").textContent = d.state || "—";
-    $("time").textContent = `${fmt(d.position)} / ${fmt(d.duration)}`;
-    $("fill").style.width = d.duration ? `${Math.min(100, d.position / d.duration * 100)}%` : "0%";
+    if (browsing) {
+      $("anime").textContent = d.details || "Browsing AnimeKai";
+      $("episode").textContent = d.browseState || "Finding something to watch";
+      $("playback").textContent = "Browsing";
+      $("time").textContent = "AnimeKai";
+      $("fill").style.width = "0%";
+    } else {
+      $("anime").textContent = d.title || "Anime";
+      $("episode").textContent = `Episode ${d.episode ?? "—"}${d.total ? ` / ${d.total}` : ""}`;
+      $("playback").textContent = d.state || "—";
+      $("time").textContent = `${fmt(d.position)} / ${fmt(d.duration)}`;
+      $("fill").style.width = d.duration ? `${Math.min(100, d.position / d.duration * 100)}%` : "0%";
+    }
     if (d.image) {
       $("cover").src = d.image;
-      $("cover").onerror = () => chrome.runtime.sendMessage({type:"coverFailed", title:d.title, url:d.image});
+      $("cover").onerror = browsing ? null : () => chrome.runtime.sendMessage({type:"coverFailed", title:d.title, url:d.image});
     }
   } else {
     $("anime").textContent = "Nothing detected";
@@ -160,17 +169,50 @@ function render(s) {
     `Helper channel: <b>${s.helperChannel || "—"}</b><br>` +
     `Discord RPC: <b>${discord ? "Connected" : "Not connected"}</b><br>` +
     `AnimeKai: <b>${d ? "Detected" : "Not detected"}</b><br>` +
-    `Player: <b>${d?.duration ? "Detected" : "Waiting"}</b><br>` +
-    `Playback: <b>${d?.state || "—"}</b><br>` +
+    `Presence: <b>${browsing ? "Browsing" : d ? "Watching" : "Idle"}</b><br>` +
+    `Player: <b>${browsing ? "Not needed" : d?.duration ? "Detected" : "Waiting"}</b><br>` +
+    `Playback: <b>${browsing ? "Browsing" : d?.state || "—"}</b><br>` +
     `RPC mode: <b>${s.rpcVariant || "—"}</b>` +
     (s.lastError ? `<br>Error: <b>${s.lastError}</b>` : "");
 
   if (s.repair) {
     const r = s.repair;
-    $("repairState").textContent = r.ok ? "Healthy ✓" : "Needs attention";
-    $("repairResult").textContent = r.fixed?.length
-      ? `Fixed: ${r.fixed.join(", ")}`
-      : (r.summary || "Health check complete");
+    const healthButton = $("health");
+    if (r.kind === "health" && r.pending) {
+      $("repairState").textContent = "Checking…";
+      $("repairResult").textContent = r.summary || "Checking system health…";
+      healthButton.disabled = true;
+      healthButton.textContent = "Checking…";
+    } else if (r.kind === "health") {
+      healthButton.disabled = false;
+      healthButton.textContent = "Run health check";
+      const h = r.health || {};
+      if (r.installationOk && r.runtimeOk) $("repairState").textContent = "Healthy ✓";
+      else if (r.installationOk) $("repairState").textContent = "Installed ✓ • Discord closed";
+      else $("repairState").textContent = "Needs attention";
+
+      const registryOk = h.registry_ok ?? (h.registry ? Object.values(h.registry).every(Boolean) : false);
+      const rows = [
+        ["Desktop helper", native],
+        ["Native Messaging manifest", !!h.manifest],
+        ["Browser registration", !!registryOk],
+        ["Local configuration", !!h.config],
+        ["Install metadata", !!h.install_info],
+        ["Discord application", !!h.client_id],
+        ["Discord connection", !!h.discord],
+        ["Player detection", !!s.playerAccess]
+      ];
+      $("repairResult").innerHTML = rows
+        .map(([label, ok]) => `<div class="healthLine"><span>${ok ? "✓" : "×"} ${label}</span><b class="${ok ? "healthGood" : "healthBad"}">${ok ? "OK" : "Check"}</b></div>`)
+        .join("") + `<div class="healthSummary">${r.summary || "System health check complete"}</div>`;
+    } else {
+      healthButton.disabled = false;
+      healthButton.textContent = "Run health check";
+      $("repairState").textContent = r.ok ? "Repaired ✓" : "Needs attention";
+      $("repairResult").textContent = r.fixed?.length
+        ? `Fixed: ${r.fixed.join(", ")}`
+        : (r.summary || "Repair complete");
+    }
   }
 }
 
@@ -248,7 +290,7 @@ async function enablePlayerAccess() {
 }
 
 function openSetupRelease() {
-  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.0.0"});
+  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.0"});
 }
 
 $("accent").oninput = e => { $("hex").value = e.target.value; saveAppearance(); };
@@ -266,7 +308,13 @@ $("refresh").onclick = refresh;
 $("playerAccess").onclick = enablePlayerAccess;
 $("helper").onclick = openSetupRelease;
 $("setup").onclick = () => chrome.tabs.create({url:chrome.runtime.getURL("onboarding.html")});
-$("health").onclick = () => chrome.runtime.sendMessage({type:"health"}, () => setTimeout(getState, 500));
+$("health").onclick = () => {
+  $("health").disabled = true;
+  $("health").textContent = "Checking…";
+  $("repairState").textContent = "Checking…";
+  $("repairResult").textContent = "Checking desktop helper, browser registration, Discord, and Player detection…";
+  chrome.runtime.sendMessage({type:"health"}, () => setTimeout(getState, 250));
+};
 $("repair").onclick = () => {
   if (confirm("Repair AnimeKai RPC? Your themes and personal settings will be kept.")) {
     chrome.runtime.sendMessage({type:"repair"}, () => setTimeout(getState, 800));
