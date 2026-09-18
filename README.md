@@ -10,7 +10,7 @@ AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Ric
 
 ## V6 is now the official release
 
-AnimeKai RPC **V6.1.5** is the current stable version.
+AnimeKai RPC **V6.1.6** is the current stable version.
 
 V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detection, a browsing presence before playback starts, clearer health checks, and a cleaner Rich Presence artwork pipeline.
 
@@ -20,7 +20,7 @@ What you get in V6:
 - faster event-first AnimeKai/player detection
 - automatic AnimeKai title and episode detection
 - play, pause, buffering, and timestamp tracking
-- anime cover art while watching with a small AnimeKai branding icon when Discord accepts it
+- anime cover art while watching with a dynamic **play / pause** badge that follows playback state
 - Discord Rich Presence with the public AnimeKai RPC application already configured
 - a small Windows desktop helper for Discord communication
 - **Refresh** / reconnect controls
@@ -87,7 +87,7 @@ You will need:
 - Windows 10 or Windows 11
 - the **Discord desktop app** installed and signed in
 - Opera, Google Chrome, Microsoft Edge, or another Chromium-based browser
-- the latest **AnimeKai-RPC-V6.1.5-Windows.zip** from the GitHub Releases page
+- the latest **AnimeKai-RPC-V6.1.6-Windows.zip** from the GitHub Releases page
 
 > **Which download should I use?**  
 > Most people should download the **Windows ZIP**. It contains both the browser extension and the desktop helper. The smaller **Extension ZIP** is mainly for people who already have the current desktop helper installed and only need the browser files.
@@ -95,7 +95,7 @@ You will need:
 ### 1. Download and extract AnimeKai RPC
 
 1. Open the [latest GitHub Release](https://github.com/viesca272/AnimeKai-RPC/releases/latest).
-2. Download **AnimeKai-RPC-V6.1.5-Windows.zip**.
+2. Download **AnimeKai-RPC-V6.1.6-Windows.zip**.
 3. Right-click the ZIP and choose **Extract All**, or extract it with your preferred archive program.
 4. Move the extracted folder somewhere you plan to keep it, such as your Documents folder.
 
@@ -104,7 +104,7 @@ Do not load the extension directly from inside the ZIP. While AnimeKai RPC is in
 After extracting, the package should contain roughly:
 
 ```text
-AnimeKai-RPC-V6.1.5/
+AnimeKai-RPC-V6.1.6/
 ├─ extension/
 ├─ native_host/
 ├─ windows/
@@ -182,7 +182,7 @@ You can reopen the setup guide later from the AnimeKai RPC popup.
 4. Open an anime and start an episode.
 5. The presence should switch to the anime title, episode, playback state, timer, and cover artwork.
 
-V6.1.5 rebuilds the browsing artwork from a clean AnimeKai icon seed and avoids the older source-processing path that produced the black/static corruption. The popup now uses a packaged local PNG, while Discord gets a fresh versioned V6.1.5 asset URL. Square, 4:3, 16:9, and 2:1 variants are still included.
+V6.1.6 rebuilds the browsing artwork from a clean AnimeKai icon seed and avoids the older source-processing path that produced the black/static corruption. The popup now uses a packaged local PNG, while Discord gets a fresh versioned V6.1.6 asset URL. Square, 4:3, 16:9, and 2:1 variants are still included.
 
 ### What a successful install looks like
 
@@ -256,7 +256,7 @@ If no usable image is available, the RPC can fall back to a clean text-only pres
 
 ## Desktop helper
 
-V6.1.5 includes an updated stable helper with:
+V6.1.6 includes an updated stable helper with:
 
 - browsing Rich Presence with crop-safe AnimeKai artwork and an elapsed timer
 - protocol v3 health/browsing support
