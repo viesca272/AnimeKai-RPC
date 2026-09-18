@@ -81,7 +81,8 @@ jobs:
         run: |
           @'
           from pathlib import Path
-          from PIL import Image
+          from PIL import Image, ImageFile
+          ImageFile.LOAD_TRUNCATED_IMAGES = True
 
           source = Path("src/v6/extension/assets/animekai.png")
           package_dir = Path("src/v6/extension/assets/rpc")
