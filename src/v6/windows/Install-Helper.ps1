@@ -1,7 +1,7 @@
 param([switch]$Repair)
 $ErrorActionPreference = "Stop"
 
-$Version = "6.0.0"
+$Version = "6.1.0"
 $Channel = "stable"
 $Root = Split-Path -Parent $PSScriptRoot
 $SourceExe = Join-Path $Root "native_host\AnimeKaiRPCNativeHost.exe"
@@ -85,9 +85,9 @@ $installInfoObject | ConvertTo-Json -Depth 4 | Set-Content -Path $InstallInfo -E
 
 $title = if($Repair){"AnimeKai RPC V6 repaired"}else{"AnimeKai RPC V6 installed"}
 $message = if($Repair){
-  "Repair finished successfully.`n`nThe V6 desktop helper, Native Messaging registration, and stable configuration were refreshed. Your appearance settings and RPC preferences were kept.`n`nReturn to the AnimeKai RPC extension and press Refresh."
+  "Repair finished successfully.`n`nThe V6.1 desktop helper, Native Messaging registration, and stable configuration were refreshed. Your appearance settings and RPC preferences were kept.`n`nReturn to the AnimeKai RPC extension and press Refresh."
 }else{
-  "AnimeKai RPC V6 desktop helper $Version is installed.`n`nNo Discord Application ID setup is needed.`n`nReturn to the extension setup page, enable Player detection if needed, and click Check again."
+  "AnimeKai RPC V6.1 desktop helper $Version is installed.`n`nNo Discord Application ID setup is needed.`n`nReturn to the extension setup page, enable Player detection if needed, and click Check again."
 }
 Add-Type -AssemblyName PresentationFramework
 [System.Windows.MessageBox]::Show($message,$title) | Out-Null
