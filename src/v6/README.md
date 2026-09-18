@@ -1,21 +1,21 @@
 # AnimeKai RPC V6
 
-**Status:** Stable — 6.0.0  
+**Status:** Stable — 6.1.0  
 **Made by viesca27**
 
-V6.0.0 is the official AnimeKai RPC release. It keeps the playback/RPC path proven by V5 and rolls in the setup, repair, artwork, permission, and appearance work tested throughout the V6 alpha builds.
+V6.1.0 is the current stable AnimeKai RPC release. It keeps the proven V6 playback/RPC path and adds polish around browsing presence, faster state transitions, and health reporting.
 
-## Included in V6.0.0
+## Included in V6.1.0
 
 - Built-in public Discord Application ID — no Discord developer setup required
 - V5-style extension icon
-- Refresh / reconnect control
+- Immediate **Browsing AnimeKai** Rich Presence with AnimeKai RPC artwork\n- Event-first detection with route/player startup bursts\n- Refresh / reconnect control
 - First-run setup guide
 - Required host access limited to AnimeKai + Jikan
 - Optional third-party player-frame access for embedded playback detection
 - Desktop-helper version/status checks
 - Install / Update Helper links
-- One-click **Repair App**
+- One-click **Repair App** plus detailed health-check results
 - Alternate anime cover lookup with a 7-day local cache
 - Text-only RPC fallback if artwork cannot be used
 - Custom accent, popup background, and card colors
@@ -36,9 +36,9 @@ The official V6 presets use gradients instead of flat backgrounds:
 
 Manual background/card color changes switch the appearance to a flat **Custom** theme so users can choose exact colors without fighting the preset gradient.
 
-## Desktop helper 6.0.0
+## Desktop helper 6.1.0
 
-The stable helper now reports its version, release channel, and protocol version back to the extension. It also has clearer Discord connection errors, retries the initial Discord connection once, records install metadata, and keeps the existing Repair App behavior.
+The stable helper supports browsing Rich Presence, protocol v3 health reporting, clearer install-vs-runtime health status, manifest validation, reduced unnecessary reconnects, install metadata, and the existing Repair App behavior.
 
 The Windows installer preserves existing V5/V6 RPC preferences and any already-added extension origins in the Native Messaging manifest while upgrading the helper.
 
