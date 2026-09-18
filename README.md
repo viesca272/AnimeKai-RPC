@@ -10,13 +10,13 @@ AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Ric
 
 ## V6 is now the official release
 
-AnimeKai RPC **V6.1.2** is the current stable version.
+AnimeKai RPC **V6.1.3** is the current stable version.
 
 V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detection, a browsing presence before playback starts, and clearer health checks.
 
 What you get in V6:
 
-- immediate **Browsing AnimeKai** presence when the site opens with the actual AnimeKai artwork
+- immediate **Browsing AnimeKai** presence with crop-safe AnimeKai artwork sized for Discord
 - faster event-first AnimeKai/player detection
 - automatic AnimeKai title and episode detection
 - play, pause, buffering, and timestamp tracking
@@ -64,14 +64,150 @@ The extension handles AnimeKai detection. The Windows helper handles the local c
 
 ## Installing V6
 
-1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.1.2-Windows.zip**.
-2. Extract the ZIP somewhere permanent.
-3. Run **Install AnimeKai RPC.cmd**.
-4. Load the included `extension` folder in your Chromium-based browser while browser-store publishing is being finalized.
-5. Open the V6 setup guide and enable **Player detection** when prompted.
-6. Open AnimeKai. Discord should show **Browsing AnimeKai** almost immediately, then switch to the normal episode presence when playback begins. **Refresh** remains available as a fallback.
+You do **not** need to create a Discord application, copy an Application ID, install Python, or keep a command window running. The public AnimeKai RPC Discord Application ID and packaged desktop helper are included in the Windows release.
 
-The Discord Application ID is already built in. You do **not** need to create a Discord application or paste an ID anywhere.
+### Before you start
+
+You will need:
+
+- Windows 10 or Windows 11
+- the **Discord desktop app** installed and signed in
+- Opera, Google Chrome, Microsoft Edge, or another Chromium-based browser
+- the latest **AnimeKai-RPC-V6.1.3-Windows.zip** from the GitHub Releases page
+
+> **Which download should I use?**  
+> Most people should download the **Windows ZIP**. It contains both the browser extension and the desktop helper. The smaller **Extension ZIP** is mainly for people who already have the current desktop helper installed and only need the browser files.
+
+### 1. Download and extract AnimeKai RPC
+
+1. Open the latest GitHub Release.
+2. Download **AnimeKai-RPC-V6.1.3-Windows.zip**.
+3. Right-click the ZIP and choose **Extract All**, or extract it with your preferred archive program.
+4. Move the extracted folder somewhere you plan to keep it, such as your Documents folder.
+
+Do not load the extension directly from inside the ZIP. While AnimeKai RPC is installed as an unpacked extension, your browser needs the extracted `extension` folder to stay in the same place.
+
+After extracting, the package should contain roughly:
+
+```text
+AnimeKai-RPC-V6.1.3/
+├─ extension/
+├─ native_host/
+├─ windows/
+├─ Install AnimeKai RPC.cmd
+├─ Repair AnimeKai RPC.cmd
+└─ Uninstall AnimeKai RPC.cmd
+```
+
+### 2. Install the desktop helper
+
+1. Make sure Discord is installed. It is fine if Discord is closed for the moment.
+2. Double-click **Install AnimeKai RPC.cmd**.
+3. Wait for the success message from AnimeKai RPC.
+4. Close the installer message.
+
+The helper is copied to:
+
+```text
+%LOCALAPPDATA%\AnimeKaiRPC
+```
+
+It handles the local connection between the browser extension and Discord. It starts when the extension connects to it, so you do **not** need to manually launch a server every time you watch anime.
+
+If you are upgrading from V5 or an older V6 build, running the new installer updates the helper while preserving normal RPC preferences.
+
+### 3. Load the browser extension
+
+Browser-store publishing is still being finalized, so the GitHub build currently uses your browser's **Load unpacked** feature.
+
+**Opera**
+
+1. Open `opera://extensions`.
+2. Turn on **Developer mode**.
+3. If an older unpacked AnimeKai RPC is installed, remove or disable it.
+4. Click **Load unpacked**.
+5. Select the extracted `extension` folder — the folder that directly contains `manifest.json`.
+
+**Google Chrome**
+
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode** in the top-right corner.
+3. Remove or disable an older unpacked AnimeKai RPC build if one is present.
+4. Click **Load unpacked**.
+5. Select the extracted `extension` folder.
+
+**Microsoft Edge**
+
+1. Open `edge://extensions`.
+2. Turn on **Developer mode**.
+3. Remove or disable an older unpacked AnimeKai RPC build if one is present.
+4. Click **Load unpacked**.
+5. Select the extracted `extension` folder.
+
+If you accidentally select the folder *above* `extension`, the browser may say it cannot find the manifest. Go back and select the folder containing `manifest.json` itself.
+
+### 4. Finish the first-run setup
+
+AnimeKai RPC should open its setup page after the extension is installed.
+
+1. Confirm that the **Desktop helper** is detected.
+2. Click **Enable player detection**.
+3. Accept the browser permission prompt.
+4. Click **Check again** if the setup page has not refreshed yet.
+
+Player detection is optional browser access used for AnimeKai's changing third-party embedded video players. It is what allows AnimeKai RPC to read play, pause, buffering, progress, and timestamps from those frames.
+
+You can reopen the setup guide later from the AnimeKai RPC popup.
+
+### 5. Verify that Discord Rich Presence works
+
+1. Open the **Discord desktop app** and make sure you are signed in.
+2. Open [AnimeKai](https://animekai.be/) in the browser where the extension is installed.
+3. Within a moment, Discord should show **Browsing AnimeKai** and **Finding something to watch**.
+4. Open an anime and start an episode.
+5. The presence should switch to the anime title, episode, playback state, timer, and cover artwork.
+
+V6.1.3 uses crop-safe AnimeKai browsing artwork designed for Discord's wide thumbnail area. The 2:1 layout is used by default, with 16:9, 4:3, and square artwork included as fallback sizes.
+
+### Updating from an older V6 version
+
+You do not need to wipe your settings for a normal update.
+
+1. Download and extract the new Windows ZIP.
+2. Run the new **Install AnimeKai RPC.cmd** to update the desktop helper.
+3. Open your browser's Extensions page.
+4. Remove the old unpacked AnimeKai RPC entry, or point/reload it using the new `extension` folder.
+5. Refresh any AnimeKai tabs that were already open.
+
+Appearance settings and normal RPC preferences are preserved where possible.
+
+### If AnimeKai RPC does not connect
+
+Try these in order:
+
+1. Make sure the **Discord desktop app** is running — Discord in a web browser is not enough.
+2. Open the AnimeKai RPC popup and press **Refresh**.
+3. Run **Run health check** and look for any item marked **Check**.
+4. If something is broken, press **Repair App**.
+5. Refresh the AnimeKai tab and try playback again.
+6. If the problem continues, use **Copy diagnostics** and include that output when opening a GitHub issue.
+
+The desktop helper log is stored at:
+
+```text
+%LOCALAPPDATA%\AnimeKaiRPC\native_host.log
+```
+
+That file is especially useful when the popup says the desktop helper or Discord RPC is not connected.
+
+### Uninstalling
+
+To remove AnimeKai RPC:
+
+1. Remove the AnimeKai RPC extension from your browser.
+2. Run **Uninstall AnimeKai RPC.cmd** from the extracted Windows package.
+
+This removes the Native Messaging registration and installed helper files. Browser-specific extension data can also be removed by your browser when the extension is deleted.
 
 ## Why does Player detection ask for optional site access?
 
@@ -93,11 +229,10 @@ If no usable image is available, the RPC can fall back to a clean text-only pres
 
 ## Desktop helper
 
-V6.1.2 includes an updated stable helper with:
+V6.1.3 includes an updated stable helper with:
 
-- browsing Rich Presence with AnimeKai RPC artwork and an elapsed timer
+- browsing Rich Presence with crop-safe AnimeKai artwork and an elapsed timer
 - protocol v3 health/browsing support
-
 - the bundled AnimeKai RPC Discord Application ID
 - clearer connection errors
 - a second Discord connection attempt before reporting failure
