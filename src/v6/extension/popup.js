@@ -290,7 +290,7 @@ async function enablePlayerAccess() {
 }
 
 function openSetupRelease() {
-  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.3"});
+  chrome.tabs.create({url:lastState?.setupUrl || "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.4"});
 }
 
 $("accent").oninput = e => { $("hex").value = e.target.value; saveAppearance(); };
