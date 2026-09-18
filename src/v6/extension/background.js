@@ -187,7 +187,10 @@ function scoreMedia(m) {
 
 function merge(tabId, frameId, data) {
   const page = pages.get(tabId) || {top:null, frames:new Map()};
-  if (data.role === "top") page.top = data;
+  if (data.role === "top") {
+    if (page.top?.url && data.url && page.top.url !== data.url) page.frames.clear();
+    page.top = data;
+  }
   page.frames.set(frameId ?? 0, data);
   pages.set(tabId, page);
   if (!page.top?.title) return;
