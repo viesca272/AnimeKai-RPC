@@ -16,7 +16,9 @@ V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detecti
 
 What you get in V6:
 
-- immediate **Browsing AnimeKai** presence when the site opens\n- faster event-first AnimeKai/player detection\n- automatic AnimeKai title and episode detection
+- immediate **Browsing AnimeKai** presence when the site opens
+- faster event-first AnimeKai/player detection
+- automatic AnimeKai title and episode detection
 - play, pause, buffering, and timestamp tracking
 - Discord Rich Presence with the public AnimeKai RPC application already configured
 - a small Windows desktop helper for Discord communication
@@ -90,7 +92,10 @@ If no usable image is available, the RPC can fall back to a clean text-only pres
 
 ## Desktop helper
 
-V6.1.0 includes an updated stable helper with:\n\n- browsing Rich Presence with AnimeKai RPC artwork and an elapsed timer\n- protocol v3 health/browsing support
+V6.1.0 includes an updated stable helper with:
+
+- browsing Rich Presence with AnimeKai RPC artwork and an elapsed timer
+- protocol v3 health/browsing support
 
 - the bundled AnimeKai RPC Discord Application ID
 - clearer connection errors
