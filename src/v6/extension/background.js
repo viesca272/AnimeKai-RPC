@@ -59,7 +59,7 @@ async function syncPlayerAccess() {
         id: PLAYER_SCRIPT_ID,
         matches: ["<all_urls>"],
         js: ["content.js"],
-        runAt: "document_idle",
+        runAt: "document_start",
         allFrames: true,
         matchOriginAsFallback: true
       }]);
@@ -140,7 +140,7 @@ function onNativeMessage(msg) {
     state.rpcVariant = msg.rpcVariant || state.rpcVariant;
     state.rpcLastUpdate = msg.rpcLastUpdate || state.rpcLastUpdate;
     state.lastError = msg.lastError || msg.error || null;
-    if (msg.artworkRejected && current?.title) resolveAlternateCover(current.title, current.image, true);
+    if (msg.artworkRejected && current?.kind !== "browsing" && current?.title) resolveAlternateCover(current.title, current.image, true);
   } else if (msg?.type === "health") {
     state.repair = {kind:"health", pending:false, ...msg};
   } else if (msg?.type === "repairResult") {
@@ -221,7 +221,7 @@ function merge(tabId, frameId, data) {
 function activitySig() {
   if (!current) return "";
   return JSON.stringify({
-    kind:current.kind, title:current.title, details:current.details, browseState:current.browseState,
+    kind:current.kind, title:current.title, browseDetails:current.details, browseState:current.browseState,
     episode:current.episode, total:current.total,
     state:current.state, p:Math.floor(current.position||0), d:Math.floor(current.duration||0),
     image:current.image, mode:settings.playbackMode, ts:settings.showTimestamp,
@@ -375,7 +375,7 @@ function browseStateForUrl(url="") {
 }
 
 function primeBrowsing(tabId, url) {
-  if (!tabId || !isAnimeKaiUrl(url)) return;
+  if (tabId == null || !isAnimeKaiUrl(url)) return;
   const page = pages.get(tabId) || {top:null, frames:new Map()};
   page.top = {
     role:"top",
