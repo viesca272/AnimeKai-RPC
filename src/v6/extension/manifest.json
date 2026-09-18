@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AnimeKai RPC",
-  "version": "6.1.5",
-  "version_name": "6.1.5",
+  "version": "6.1.6",
+  "version_name": "6.1.6",
   "description": "Automatic Discord Rich Presence for AnimeKai. Made by viesca27.",
   "permissions": [
     "nativeMessaging",
