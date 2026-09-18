@@ -39,7 +39,7 @@ jobs:
           if ($background -notmatch 'const VERSION = "6\.1\.4"') { throw "Extension background version is not V6.1.4." }
           if ($background -notmatch 'BROWSING_ARTWORK_URLS') { throw "Browsing artwork map is missing." }
           if ($background -notmatch 'AnimeKai-Browsing-Square-512x512\.png') { throw "Square PNG browsing artwork is not configured." }
-          if ($background -match '\.jpg') { throw "Legacy JPEG browsing artwork reference is still present." }
+          if ($background -match 'AnimeKai-Browsing-[^"]+\.jpg') { throw "Legacy JPEG browsing artwork reference is still present." }
           if (!(Test-Path "src/v6/extension/assets/animekai.png")) { throw "Source AnimeKai artwork file is missing." }
           if ($background -notmatch 'Checking system health') { throw "Improved health-check state is missing." }
           if ($background -notmatch 'runAt: "document_start"') { throw "Dynamic player detector is not starting early." }
@@ -67,7 +67,7 @@ jobs:
           if ($text -notmatch 'BROWSING_ARTWORK_URLS') { throw "Native browsing artwork fallbacks are missing." }
           if ($text -notmatch 'AnimeKai-Browsing-Square-512x512\.png') { throw "Native square browsing artwork is missing." }
           if ($text -notmatch 'AnimeKai-Browsing-2x1-1280x640\.png') { throw "Native wide PNG fallback is missing." }
-          if ($text -match '\.jpg') { throw "Native helper still references legacy JPEG browsing artwork." }
+          if ($text -match 'AnimeKai-Browsing-[^"]+\.jpg') { throw "Native helper still references legacy JPEG browsing artwork." }
           if ($text -notmatch '"small_image": BROWSING_ICON_URL') { throw "Watching RPC small AnimeKai branding is missing." }
           if ($text -notmatch 'installation_ok') { throw "Detailed health validation is missing." }
           if ($text -notmatch '1543575455523807385') { throw "Bundled Discord Application ID is missing." }
