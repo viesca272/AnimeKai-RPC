@@ -14,7 +14,8 @@ HOST_VERSION = "6.1.0"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
-PUBLISHER_CLIENT_ID = "1543575455523807385"\nBROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png"
+PUBLISHER_CLIENT_ID = "1543575455523807385"
+BROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/main/src/v6/extension/icons/icon128.png"
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
