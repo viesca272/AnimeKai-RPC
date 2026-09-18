@@ -1,15 +1,19 @@
 const HOST = "com.animekai.discordrpc";
-const VERSION = "6.1.3";
+const VERSION = "6.1.4";
 const PUBLISHER_CLIENT_ID = "1543575455523807385";
 const PLAYER_SCRIPT_ID = "animekai-rpc-player-frames";
-const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.3";
+const SETUP_URL = "https://github.com/viesca272/AnimeKai-RPC/releases/tag/v6.1.4";
 const BROWSING_ARTWORK_URLS = {
-  wide: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-2x1-1024x512.jpg",
-  cinema: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-16x9-1280x720.jpg",
-  classic: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-4x3-1024x768.jpg",
-  square: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-Square-512x512.jpg"
+  square: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-512x512.png",
+  squareHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-1024x1024.png",
+  classic: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-512x384.png",
+  classicHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-1024x768.png",
+  cinema: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-640x360.png",
+  cinemaHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-1280x720.png",
+  wide: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-640x320.png",
+  wideHi: "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-1280x640.png"
 };
-const BROWSING_IMAGE_URL = BROWSING_ARTWORK_URLS.wide;
+const BROWSING_IMAGE_URL = BROWSING_ARTWORK_URLS.square;
 const DEFAULTS = {
   enabled: true,
   client_id: PUBLISHER_CLIENT_ID,
@@ -353,7 +357,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       `Discord application: Bundled`,
       `Player access: ${state.playerAccess?"Enabled":"Limited"}`,
       `Appearance preset: ${settings.preset || "custom"}`,
-      `Browsing artwork: 2:1 crop-safe`,
+      `Browsing artwork: square PNG (crop-safe)`,
       `Native helper: ${state.nativeConnected?"Connected":"Disconnected"}`,
       `Helper version: ${state.hostVersion||"—"}`,
       `Helper channel: ${state.helperChannel||"—"}`,
