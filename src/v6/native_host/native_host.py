@@ -10,12 +10,18 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.1.2"
+HOST_VERSION = "6.1.3"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 PUBLISHER_CLIENT_ID = "1543575455523807385"
-BROWSING_ICON_URL = "https://raw.githubusercontent.com/viesca272/AnimeKai-RPC/v6.1.2/src/v6/extension/assets/animekai.png"
+BROWSING_ARTWORK_URLS = [
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-2x1-1024x512.jpg",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-16x9-1280x720.jpg",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-4x3-1024x768.jpg",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-Square-512x512.jpg",
+]
+BROWSING_ICON_URL = BROWSING_ARTWORK_URLS[-1]
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
@@ -213,27 +219,33 @@ def activity(d, settings=None, override=None):
         if c.get("showTimestamp", True) and browsing_started is not None:
             base["start"] = int(browsing_started * 1000)
 
-        full = dict(base)
-        image = str(d.get("image") or BROWSING_ICON_URL)
-        if image.startswith(("http://", "https://")):
+        requested_image = str(d.get("image") or "").strip()
+        artwork_candidates = []
+        if requested_image.startswith(("http://", "https://")):
+            artwork_candidates.append(requested_image)
+        for candidate in BROWSING_ARTWORK_URLS:
+            if candidate not in artwork_candidates:
+                artwork_candidates.append(candidate)
+
+        for index, image in enumerate(artwork_candidates):
+            full = dict(base)
             full.update({
                 "large_image": image,
                 "large_text": "AnimeKai",
+                "buttons": [{"label": "Open AnimeKai", "url": str(d.get("url") or "https://animekai.be/")[:512]}],
             })
-        full["buttons"] = [{"label": "Open AnimeKai", "url": str(d.get("url") or "https://animekai.be/")[:512]}]
-
-        try:
-            rpc.update(**full)
-            last_variant = "browsing"
-            last_error = None
-            last_rpc_update = int(time.time() * 1000)
-            artwork_rejected = False
-            status()
-            return
-        except Exception as e:
-            last_error = friendly_error(e)
-            artwork_rejected = True
-            log("Browsing RPC with artwork failed: " + repr(e))
+            try:
+                rpc.update(**full)
+                last_variant = "browsing-wide" if index == 0 else f"browsing-fallback-{index}"
+                last_error = None
+                last_rpc_update = int(time.time() * 1000)
+                artwork_rejected = False
+                status()
+                return
+            except Exception as e:
+                last_error = friendly_error(e)
+                artwork_rejected = True
+                log(f"Browsing RPC artwork candidate {index + 1} failed: " + repr(e))
 
         try:
             rpc.update(**base)
