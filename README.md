@@ -10,16 +10,17 @@ AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Ric
 
 ## V6 is now the official release
 
-AnimeKai RPC **V6.1.1** is the current stable version.
+AnimeKai RPC **V6.1.2** is the current stable version.
 
 V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detection, a browsing presence before playback starts, and clearer health checks.
 
 What you get in V6:
 
-- immediate **Browsing AnimeKai** presence when the site opens
+- immediate **Browsing AnimeKai** presence when the site opens with the actual AnimeKai artwork
 - faster event-first AnimeKai/player detection
 - automatic AnimeKai title and episode detection
 - play, pause, buffering, and timestamp tracking
+- anime cover art while watching with a small AnimeKai branding icon when Discord accepts it
 - Discord Rich Presence with the public AnimeKai RPC application already configured
 - a small Windows desktop helper for Discord communication
 - **Refresh** / reconnect controls
@@ -63,7 +64,7 @@ The extension handles AnimeKai detection. The Windows helper handles the local c
 
 ## Installing V6
 
-1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.1.1-Windows.zip**.
+1. Open the latest GitHub Release and download **AnimeKai-RPC-V6.1.2-Windows.zip**.
 2. Extract the ZIP somewhere permanent.
 3. Run **Install AnimeKai RPC.cmd**.
 4. Load the included `extension` folder in your Chromium-based browser while browser-store publishing is being finalized.
@@ -92,7 +93,7 @@ If no usable image is available, the RPC can fall back to a clean text-only pres
 
 ## Desktop helper
 
-V6.1.1 includes an updated stable helper with:
+V6.1.2 includes an updated stable helper with:
 
 - browsing Rich Presence with AnimeKai RPC artwork and an elapsed timer
 - protocol v3 health/browsing support
