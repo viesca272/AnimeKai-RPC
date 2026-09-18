@@ -10,18 +10,22 @@ else:
     IMPORT_ERROR = None
 
 HOST_NAME = "com.animekai.discordrpc"
-HOST_VERSION = "6.1.3"
+HOST_VERSION = "6.1.4"
 HELPER_CHANNEL = "stable"
 PROTOCOL_VERSION = 3
 DEV_EXTENSION_ID = "jjmnjgihigllehhjfhcmhcgnkhjdablc"
 PUBLISHER_CLIENT_ID = "1543575455523807385"
 BROWSING_ARTWORK_URLS = [
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-2x1-1024x512.jpg",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-16x9-1280x720.jpg",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-4x3-1024x768.jpg",
-    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.3/AnimeKai-Browsing-Square-512x512.jpg",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-512x512.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-Square-1024x1024.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-512x384.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-4x3-1024x768.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-640x360.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-16x9-1280x720.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-640x320.png",
+    "https://github.com/viesca272/AnimeKai-RPC/releases/download/v6.1.4/AnimeKai-Browsing-2x1-1280x640.png",
 ]
-BROWSING_ICON_URL = BROWSING_ARTWORK_URLS[-1]
+BROWSING_ICON_URL = BROWSING_ARTWORK_URLS[0]
 APP_DIR = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "AnimeKaiRPC"
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = APP_DIR / "config.json"
