@@ -370,7 +370,7 @@ function isAnimeKaiUrl(url="") {
 function browseStateForUrl(url="") {
   try {
     const u = new URL(url);
-    const searching = /\\/search(?:\\/|$)/i.test(u.pathname)
+    const searching = /\/search(?:\/|$)/i.test(u.pathname)
       || ["q","query","keyword","search"].some(k => u.searchParams.has(k));
     return searching ? "Searching for something to watch" : "Finding something to watch";
   } catch {
