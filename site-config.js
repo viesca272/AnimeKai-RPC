@@ -6,6 +6,6 @@ window.ANIMEKAI_SITE = {
   operaStoreUrl: "",
   supportUrl: "",
   issuesUrl: "https://github.com/viesca272/AnimeKai-RPC/issues",
-  stableVersion: "6.1.5",
+  stableVersion: "6.1.6",
   nextVersion: "6.2.0"
 };
