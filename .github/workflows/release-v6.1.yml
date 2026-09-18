@@ -36,7 +36,7 @@ jobs:
           if ($content -notmatch 'queueBurst') { throw "Fast startup burst detection is missing." }
 
           $background = Get-Content src/v6/extension/background.js -Raw
-          if ($background -notmatch 'const VERSION = "6\.1\.0"') { throw "Extension background version is not V6.1.1." }
+          if ($background -notmatch 'const VERSION = "6\.1\.1"') { throw "Extension background version is not V6.1.1." }
           if ($background -notmatch 'BROWSING_IMAGE_URL') { throw "Browsing artwork is missing." }
           if ($background -notmatch 'Checking system health') { throw "Improved health-check state is missing." }
           if ($background -notmatch 'runAt: "document_start"') { throw "Dynamic player detector is not starting early." }
@@ -58,7 +58,7 @@ jobs:
         run: |
           python -m py_compile src/v6/native_host/native_host.py
           $text = Get-Content src/v6/native_host/native_host.py -Raw
-          if ($text -notmatch 'HOST_VERSION = "6\.1\.0"') { throw "Native helper version is not V6.1.1." }
+          if ($text -notmatch 'HOST_VERSION = "6\.1\.1"') { throw "Native helper version is not V6.1.1." }
           if ($text -notmatch 'HELPER_CHANNEL = "stable"') { throw "Native helper is not marked stable." }
           if ($text -notmatch 'PROTOCOL_VERSION = 3') { throw "Native helper protocol is not V6.1." }
           if ($text -notmatch 'BROWSING_ICON_URL') { throw "Native browsing artwork support is missing." }
