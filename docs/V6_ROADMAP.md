@@ -24,7 +24,7 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [x] Add **Browsing AnimeKai** presence before playback starts
 - [x] Use the actual AnimeKai artwork supplied for browsing presence
 - [x] Add a crop-safe browsing artwork pack (2:1, 16:9, 4:3, square)
-- [x] Add small AnimeKai branding to the watching RPC when supported
+- [x] Restore dynamic play / pause badges on the watching RPC
 - [x] Add browsing elapsed time
 - [x] Move AnimeKai detection to document_start
 - [x] Add route/player startup detection bursts
@@ -33,7 +33,7 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [x] Avoid unnecessary RPC reconnects for appearance-only changes
 - [x] Expand Run health check into per-component results
 - [x] Distinguish a healthy install with Discord closed from an installation problem
-- [x] Update desktop helper to 6.1.5 / protocol v3
+- [x] Update desktop helper to 6.1.6 / protocol v3
 
 ## Next V6 updates
 
@@ -62,4 +62,4 @@ V6 is focused on making AnimeKai RPC something another person can install withou
 - [ ] Add a smoother one-click update experience for the helper
 - [ ] Test installer/uninstaller on clean Windows accounts
 
-V6.1.5 is the current stable GitHub release. V5 stays available as the legacy fallback build.
+V6.1.6 is the current stable GitHub release. V5 stays available as the legacy fallback build.
