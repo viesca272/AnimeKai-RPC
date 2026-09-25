@@ -12,6 +12,8 @@ AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Ric
 
 AnimeKai RPC **V6.1.6** is the current stable version.
 
+**V6.1.6 soft update:** The play/pause badge circles are now black with white symbols. This artwork-only change is incorporated into the existing V6.1.6 release, with no version bump or playback behavior changes.
+
 V6.1 keeps the stable V6 playback/RPC path and focuses on polish: faster detection, a browsing presence before playback starts, clearer health checks, and a cleaner Rich Presence artwork pipeline.
 
 What you get in V6:
