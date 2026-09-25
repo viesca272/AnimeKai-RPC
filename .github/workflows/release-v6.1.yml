@@ -131,7 +131,7 @@ jobs:
           for name, width, height in variants:
               save_png(wide_variant(width, height), name)
 
-          # Playback-state badges for the small Rich Presence overlay.
+          # V6.1.6 soft update: black playback badges for the small Rich Presence overlay.
           for name, paused in (
               ("AnimeKai-Playback-Play-256x256.png", False),
               ("AnimeKai-Playback-Pause-256x256.png", True),
