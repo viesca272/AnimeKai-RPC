@@ -25,7 +25,7 @@ V6.1.6 ships two simple PNG assets generated during the release build:
 - `AnimeKai-Playback-Play-256x256.png`
 - `AnimeKai-Playback-Pause-256x256.png`
 
-They use a clean green circular button with a white playback symbol so they remain readable at Discord's small overlay size.
+They use a clean black circular button with a white playback symbol so they remain readable at Discord's small overlay size.
 
 ## Upgrade
 
