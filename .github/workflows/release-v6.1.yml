@@ -138,7 +138,7 @@ jobs:
           ):
               badge = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
               draw = ImageDraw.Draw(badge)
-              draw.ellipse((12, 12, 244, 244), fill=(33, 166, 91, 255))
+              draw.ellipse((12, 12, 244, 244), fill=(0, 0, 0, 255))
               if paused:
                   draw.rounded_rectangle((78, 62, 112, 194), radius=8, fill=(255, 255, 255, 255))
                   draw.rounded_rectangle((144, 62, 178, 194), radius=8, fill=(255, 255, 255, 255))
