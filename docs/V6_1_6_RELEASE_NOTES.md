@@ -2,6 +2,10 @@
 
 V6.1.6 restores the playback-state badges on the watching Rich Presence.
 
+## V6.1.6 soft update
+
+The play/pause badge circles have changed from green to black, keeping the white symbols. This artwork-only soft update refreshes the assets and downloads in the existing V6.1.6 release. The version remains V6.1.6, and playback behavior is unchanged.
+
 ## Play / pause badges are back
 
 While an episode is open:
