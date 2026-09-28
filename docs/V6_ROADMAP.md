@@ -1,5 +1,7 @@
 # V6 roadmap
 
+For the Anime-RPC rebrand, multi-site support, and upcoming store work, see the [V7 roadmap](V7_ROADMAP.md). The V6 history and backlog below remain available for reference.
+
 V6 is focused on making AnimeKai RPC something another person can install without needing to understand how it works internally.
 
 ## V6.0.0 stable milestone
