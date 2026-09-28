@@ -1,8 +1,14 @@
-# AnimeKai RPC
+# Anime-RPC
 
-**Watch on AnimeKai. Let Discord handle the rest.**
+**Your anime, on your Discord profile.**
 
-AnimeKai RPC automatically shows what you're watching on AnimeKai as Discord Rich Presence. Once the browser extension and Windows helper are installed, you can open an episode and just watch — the title, episode, playback state, timer, and artwork update in Discord for you.
+Anime-RPC (formerly AnimeKai RPC) shows what you're watching as Discord Rich Presence. The current V6.1.6 release supports AnimeKai: once the browser extension and Windows helper are installed, the title, episode, playback state, timer, and artwork update in Discord for you.
+
+## V7 plans
+
+V7 will expand Anime-RPC beyond AnimeKai. The planned site targets are **AnimeKai**, **AnimePahe**, and **9animehd.live**, alongside easier installation, browser-store preparation, and improved project visibility. Support for the additional sites is planned and still needs implementation and playback testing.
+
+Existing V6 downloads and installer names remain **AnimeKai RPC**.
 
 **Made by viesca27**
 
@@ -308,6 +314,6 @@ See [LICENSE](LICENSE).
 
 ---
 
-Thanks for using AnimeKai RPC.
+Thanks for using Anime-RPC.
 
 **Made by viesca27**
