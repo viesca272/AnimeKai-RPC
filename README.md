@@ -8,6 +8,8 @@ Anime-RPC (formerly AnimeKai RPC) shows what you're watching as Discord Rich Pre
 
 V7 will expand Anime-RPC beyond AnimeKai. The planned site targets are **AnimeKai**, **AnimePahe**, and **9animehd.live**, alongside easier installation, browser-store preparation, and improved project visibility. Support for the additional sites is planned and still needs implementation and playback testing.
 
+Follow the [V7 roadmap](docs/V7_ROADMAP.md) for milestones, site targets, store preparation, and release checks. V7 is currently in planning; implementation has not started.
+
 Existing V6 downloads and installer names remain **AnimeKai RPC**.
 
 **Made by viesca27**
