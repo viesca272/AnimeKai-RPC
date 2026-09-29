@@ -7,5 +7,5 @@ window.ANIMEKAI_SITE = {
   supportUrl: "",
   issuesUrl: "https://github.com/viesca272/AnimeKai-RPC/issues",
   stableVersion: "6.1.6",
-  nextVersion: "6.2.0"
+  nextVersion: "7.0.0-alpha.1"
 };

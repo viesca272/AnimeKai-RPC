@@ -1,9 +1,9 @@
 name: Bug report
-description: Something in AnimeKai RPC is not working
+description: Something in Anime-RPC is not working
 body:
   - type: markdown
     attributes:
-      value: "Thanks for reporting it. Please use **Copy diagnostics** in AnimeKai RPC first — it makes these much easier to fix."
+      value: "Thanks for reporting it. Please use **Copy diagnostics** in Anime-RPC first — it makes these much easier to fix."
   - type: textarea
     id: problem
     attributes:
@@ -29,5 +29,25 @@ body:
   - type: input
     id: version
     attributes:
-      label: AnimeKai RPC version
-      placeholder: 6.0.0-alpha.1
+      label: Anime-RPC version
+      placeholder: 7.0.0-alpha.1 (or 6.1.6)
+
+  - type: dropdown
+    id: site
+    attributes:
+      label: Site
+      options:
+        - AnimeKai (animekai.be)
+        - AnimePahe (animepahe.com, V7 experimental)
+        - 9anime (9animehd.live, V7 experimental)
+        - No site / installation issue
+  - type: input
+    id: helper_version
+    attributes:
+      label: Desktop helper version
+      description: Find this in the popup diagnostics; include the browser version too.
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the page URL if safe to share, playback state, and whether Player detection is enabled. Never include passwords or account tokens.
