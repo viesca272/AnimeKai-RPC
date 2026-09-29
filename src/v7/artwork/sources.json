@@ -1,0 +1,16 @@
+{
+  "animekai": {
+    "source": "src/v6/extension/assets/animekai-clean.webp.b64",
+    "note": "Existing project artwork retained from V6."
+  },
+  "animepahe": {
+    "source": "https://online.fliphtml5.com/recev/accountlogo.png",
+    "page": "https://fliphtml5.com/homepage/recev",
+    "note": "Public AnimePahe wordmark reference; not a verified official account."
+  },
+  "nineanime": {
+    "source": "https://www.videoproc.com/images/vp-seo/9anime.jpg",
+    "page": "https://www.videoproc.com/resource/kissanime-alternatives.htm",
+    "note": "Public 9Anime branding reference, not verification of affiliation with 9animehd.live."
+  }
+}

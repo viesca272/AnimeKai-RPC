@@ -1,0 +1,12 @@
+{
+  "name": "anime-rpc",
+  "version": "7.0.0-alpha.1",
+  "private": true,
+  "description": "Development checks for Anime-RPC; no npm packages ship inside the extension.",
+  "scripts": {
+    "test": "node --test tests/v7/*.test.cjs",
+    "check": "node tools/check-v7.cjs"
+  },
+  "devDependencies": { "linkedom": "0.18.12" },
+  "engines": { "node": ">=20" }
+}

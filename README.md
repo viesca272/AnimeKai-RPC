@@ -4,13 +4,15 @@
 
 Anime-RPC (formerly AnimeKai RPC) shows what you're watching as Discord Rich Presence. The current V6.1.6 release supports AnimeKai: once the browser extension and Windows helper are installed, the title, episode, playback state, timer, and artwork update in Discord for you.
 
-## V7 plans
+## V7 alpha 1 — still needs checking
 
-V7 will expand Anime-RPC beyond AnimeKai. The planned site targets are **AnimeKai**, **AnimePahe**, and **9animehd.live**, alongside easier installation, browser-store preparation, and improved project visibility. Support for the additional sites is planned and still needs implementation and playback testing.
+[V7 prerelease downloads](https://github.com/viesca272/AnimeKai-RPC/releases/tag/v7.0.0-alpha.1) · [Install guide](docs/V7_INSTALL.md) · [Release notes](docs/V7_RELEASE_NOTES.md) · [Test record](docs/V7_TESTING.md)
 
-Follow the [V7 roadmap](docs/V7_ROADMAP.md) for milestones, site targets, store preparation, and release checks. V7 is currently in planning; implementation has not started.
+V7 now includes separate AnimeKai, AnimePahe, and **9animehd.live** adapters, site controls, browsing covers for each site, black playback badges, and local guided FAQ help. AnimePahe and 9anime are experimental and disabled by default. **Live playback and real Discord rendering on all three sites still need checking.** Automated fixture tests and Windows installer/helper checks do not replace that testing.
 
-Existing V6 downloads and installer names remain **AnimeKai RPC**.
+The [V7 roadmap](docs/V7_ROADMAP.md) tracks remaining verification, store preparation, and outreach. Read the [store-readiness notes](docs/V7_STORE_READINESS.md) for permissions and pending submission work. The project is named Anime-RPC; the repository URL and public Discord application's existing identity remain unchanged pending their separate rename.
+
+V6.1.6 remains stable, and its installer names remain **AnimeKai RPC**. V7 uses **Install Anime-RPC.cmd** and retains V6's internal IDs and preferences for migration.
 
 **Made by viesca27**
 
@@ -56,7 +58,7 @@ You can also choose your own accent, popup background, and card colors. Custom c
 
 ## What happened to V5?
 
-V5 is still available in Releases as the legacy stable build and a useful fallback if somebody runs into a V6-specific issue. New installs should use V6.
+V5 is still available in Releases as the legacy stable build and a useful fallback if somebody runs into a V6-specific issue. New installs should use V6 unless deliberately testing the V7 prerelease.
 
 ## How it works
 

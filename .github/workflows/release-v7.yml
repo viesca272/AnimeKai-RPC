@@ -1,0 +1,75 @@
+name: V7 prerelease checks and Windows package
+
+on:
+  push:
+    branches: [main, codex/v7-alpha1]
+    paths:
+      - 'src/v7/**'
+      - 'tests/v7/**'
+      - 'tools/**'
+      - 'package*.json'
+      - '.github/workflows/release-v7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Test and build on Windows VM
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install -r tools/requirements-v7.txt
+      - name: Build artwork and check extension
+        run: |
+          python tools/build-v7-artwork.py
+          npm run check
+          npm test
+          python -m unittest discover -s tests/v7 -p test_host.py -v
+      - name: Build standalone native helper
+        run: python -m PyInstaller --clean --noconfirm --onefile --console --name AnimeKaiRPCNativeHost src/v7/native_host/native_host.py
+      - name: Assemble release ZIPs
+        run: python tools/package-v7.py --exe dist/AnimeKaiRPCNativeHost.exe
+      - name: Test Windows install, upgrade, repair, and helper protocol
+        shell: powershell
+        run: ./tests/v7/windows-smoke.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Anime-RPC-V7-Windows
+          path: release-v7/*
+          if-no-files-found: error
+  publish:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: Anime-RPC-V7-Windows
+          path: release-v7
+      - name: Publish alpha without replacing stable V6
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v7.0.0-alpha.1 >/dev/null 2>&1; then
+            gh release upload v7.0.0-alpha.1 release-v7/* --clobber
+            gh release edit v7.0.0-alpha.1 --title 'Anime-RPC V7 alpha 1 — STILL NEEDS CHECKING' --notes-file docs/V7_RELEASE_NOTES.md --prerelease --latest=false
+          else
+            gh release create v7.0.0-alpha.1 release-v7/* --target "$GITHUB_SHA" --title 'Anime-RPC V7 alpha 1 — STILL NEEDS CHECKING' --notes-file docs/V7_RELEASE_NOTES.md --prerelease --latest=false
+          fi

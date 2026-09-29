@@ -1,7 +1,11 @@
 # Anime-RPC V7 roadmap
 
-Status: planning — implementation has not started.
-Updated: September 28, 2026.
+Status: V7 alpha 1 implemented — prerelease, still needs live checking.
+Updated: September 29, 2026.
+
+[Release notes](V7_RELEASE_NOTES.md) · [Install guide](V7_INSTALL.md) · [Test record](V7_TESTING.md) · [Store readiness](V7_STORE_READINESS.md)
+
+Code and fixture checks are in `src/v7` and `tests/v7`. The new site adapters are provisional; AnimePahe and 9anime are off by default. The demo uses simulated playback. Live site playback and Discord validation remain release gates.
 
 V7 expands AnimeKai RPC into **Anime-RPC**: Discord Rich Presence for multiple anime sites, with easier installation and a clearer public presence. V6.1.6 remains the current stable release, including its black playback-badge soft update.
 
@@ -13,15 +17,15 @@ V7 expands AnimeKai RPC into **Anime-RPC**: Discord Rich Presence for multiple a
 - Improve the project page, demonstration material, and discoverability.
 - Finish this roadmap before starting implementation.
 
-These are release goals, not claims of working V7 support. No release date is committed.
+These remain stable-release goals. Alpha implementation does not establish verified live support.
 
 ## Site targets
 
 | Site | Target | Current evidence | Work needed |
 | --- | --- | --- | --- |
 | AnimeKai | Existing animekai.be integration | Supported by V6; current availability and playback need a fresh check | Preserve behavior and verify live playback before promising V7 support |
-| AnimePahe | Exact production domain to verify | Shortlisted from audience research; automated homepage access was blocked | Confirm the domain, inspect title/episode metadata and embedded players, then test detection |
-| 9anime | https://9animehd.live | User-selected domain; homepage accessible | Inspect watch pages and embedded players, then test detection |
+| AnimePahe | animepahe.com (provisional exact domain) | Experimental adapter and fixtures; direct access blocked | Verify current live DOM, embedded players, and playback |
+| 9anime | https://9animehd.live | User-selected domain; experimental adapter and fixtures | Verify actual episode DOM, frames, and live playback |
 
 9animehd.live replaces Miruro in the V7 scope. Support applies to verified domains, not every site using the same name. Homepage access alone does not establish playback compatibility.
 
@@ -32,20 +36,20 @@ These are release goals, not claims of working V7 support. No release date is co
 - [ ] Rename the GitHub repository to Anime-RPC.
 - [ ] Audit repository links, GitHub Pages paths, release-asset URLs, support links, and workflow references before completing the rename.
 - [ ] Plan the extension, website, installer, and Discord application display-name changes.
-- [ ] Define the V6-to-V7 migration: settings, extension IDs, native-host registration, and existing installations.
+- [x] Define the V6-to-V7 migration: settings, extension IDs, native-host registration, and existing installations.
 - [ ] Confirm each site's live domain and basic playback feasibility.
 
 Completion: site targets and naming changes are documented, with a migration plan that preserves working V6 installations.
 
 ## Milestone 2 — Multi-site detection
 
-- [ ] Give each site its own detection module and use a shared playback format for Discord.
-- [ ] Collect the site name, anime title, episode, available episode total, artwork, playback position, duration, and playback state.
-- [ ] Show unknown metadata honestly rather than inventing episode totals or timestamps.
+- [x] Give each site its own detection module and use a shared playback format for Discord.
+- [x] Collect the site name, anime title, episode, available episode total, artwork, playback position, duration, and playback state.
+- [x] Show unknown metadata honestly rather than inventing episode totals or timestamps.
 - [ ] Handle embedded players, episode navigation, player replacement, and tab closure.
-- [ ] Add a Supported sites section with per-site enable/disable controls and understandable permission requests.
-- [ ] Prefer an actively playing tab; define a stable tie-breaker when more than one tab is playing.
-- [ ] Keep a paused foreground tab from replacing another tab that is playing.
+- [x] Add a Supported sites section with per-site enable/disable controls and understandable permission requests.
+- [x] Prefer an actively playing tab; define a stable tie-breaker when more than one tab is playing.
+- [x] Keep a paused foreground tab from replacing another tab that is playing.
 - [ ] Prevent unrelated pages, advertisements, or stale player frames from publishing anime activity.
 
 Completion: each supported site passes the playback checks below and multiple tabs do not repeatedly overwrite one another's presence.
@@ -53,11 +57,11 @@ Completion: each supported site passes the playback checks below and multiple ta
 ## Milestone 3 — Consistent Discord presence
 
 - [ ] Preserve title, episode, cover artwork, playback timers, and pause/resume behavior across supported sites.
-- [ ] Retain **black circular play/pause badges with white symbols**.
-- [ ] Make browsing text and fallback artwork appropriate to the detected site.
-- [ ] Preserve alternate artwork recovery and existing appearance preferences.
-- [ ] Make Refresh, reconnect, health checks, and diagnostics identify the active site and explain detection failures.
-- [ ] Clear stale presence when playback or a supported session ends, using a documented policy.
+- [x] Retain **black circular play/pause badges with white symbols**.
+- [x] Make browsing text and fallback artwork appropriate to the detected site.
+- [x] Preserve alternate artwork recovery and existing appearance preferences.
+- [x] Make Refresh, reconnect, health checks, and diagnostics identify the active site and explain detection failures.
+- [x] Clear stale presence when playback or a supported session ends, using a documented policy.
 
 Completion: users get the same core presence features on every supported site, with clear fallbacks where metadata is unavailable.
 
@@ -67,7 +71,7 @@ Proposed order: Chrome Web Store first, Microsoft Edge Add-ons next. Continue ch
 
 - [ ] Audit permissions against actual multi-site behavior, including tabs and optional embedded-player access.
 - [ ] Request only the access needed for enabled features and test denied/revoked permissions.
-- [ ] Package detection logic with the extension; audit for remotely executed code.
+- [x] Package detection logic with the extension; audit for remotely executed code.
 - [ ] Update the privacy page and store disclosures for site metadata, Discord presence, native messaging, artwork lookups, and local storage.
 - [ ] Record production store extension IDs and register them in the helper allowlist.
 - [ ] Test a clean Windows install, repair, uninstall, and migration from V6.1.6.
@@ -161,3 +165,9 @@ Firefox, macOS/Linux helpers, further streaming sites, watch-history syncing, an
 - [Chrome Web Store privacy disclosures](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)
 
 **Made by viesca27**
+
+## Alpha implementation checkpoint
+
+Implemented: separate adapters, exact domain registry, per-site switches, normalized playback, playing-first tab selection, frame-tree validation, navigation cleanup, site artwork, black badges, replacement-cover persistence, local FAQ help, migration-aware Windows packaging, and automated checks. Checked boxes describe implemented work; multi-site live acceptance is still open.
+
+Remaining: live Chrome/Edge/Opera and Discord testing, current-site selector verification, repository rename, Discord application display name, store IDs/allowlists/listings, signed installer distribution, image-rights review, and wider outreach. See the test record for the unchecked manual gate.

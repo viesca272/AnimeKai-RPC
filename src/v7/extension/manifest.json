@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Anime-RPC",
+  "version": "7.0.0.1",
+  "version_name": "7.0.0-alpha.1",
+  "description": "Discord Rich Presence for anime. V7 prerelease: multi-site detection still needs live testing.",
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "tabs",
+    "scripting",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://animekai.be/*",
+    "https://www.animekai.be/*",
+    "https://animepahe.com/*",
+    "https://www.animepahe.com/*",
+    "https://9animehd.live/*",
+    "https://www.9animehd.live/*",
+    "https://api.jikan.moe/*"
+  ],
+  "optional_host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Anime-RPC V7 \u2014 prerelease",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://animekai.be/*",
+        "https://www.animekai.be/*",
+        "https://animepahe.com/*",
+        "https://www.animepahe.com/*",
+        "https://9animehd.live/*",
+        "https://www.9animehd.live/*"
+      ],
+      "js": [
+        "sites.js",
+        "adapters/animekai.js",
+        "adapters/animepahe.js",
+        "adapters/nineanime.js",
+        "playback.js",
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqpv7CAwU3qYAUsAfyTMr7j8GY3effVz9dQHTcMpSxq2E8/tKixQCkOaMnlBhcg+ye0zemkUVgvVQP4PKKA8ynHQaV8mB2YNhLx+7glOZ9ruXBbryFR0LZjfntDGvZnhi6eZn21tz3rQr83NSpW8+DmGtoVZtn7OnwhILlRzxen/awnUEmykdArWWZJAnChnIrgPBoWyEpJ55xct8ls0HbNkrjqyGD53SmLkVfBtAv7T4MwlpaHLhE84UOLwfKmvBxOWpdHtcSomXEjyNqHnj+66B4c238+nn953lFvSKjrSbM5z/pUehDCa7Nu4Y+mA3VJhkZkXhv6bAx8b85zklFwIDAQAB",
+  "minimum_chrome_version": "119"
+}
