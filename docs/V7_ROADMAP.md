@@ -76,7 +76,7 @@ Proposed order: Chrome Web Store first, Microsoft Edge Add-ons next. Continue ch
 - [ ] Record production store extension IDs and register them in the helper allowlist.
 - [ ] Test a clean Windows install, repair, uninstall, and migration from V6.1.6.
 - [ ] Choose the desktop-helper installer signing and distribution approach.
-- [ ] Make helper installation and missing-helper recovery clear during onboarding.
+- [x] Make helper installation and missing-helper recovery clear during onboarding.
 - [ ] Prepare listing text, screenshots, support/privacy links, and reproducible reviewer setup instructions.
 - [ ] Submit store builds, resolve review feedback, and verify the installed store versions.
 
@@ -87,8 +87,9 @@ Use the [existing store checklist](STORE_RELEASE_CHECKLIST.md) as a starting poi
 ## Milestone 5 — Reach and launch material
 
 - [ ] Update the landing page and GitHub description for Anime-RPC.
-- [ ] Publish an accurate supported-sites list with platform requirements.
-- [ ] Create a short demonstration showing site detection, Discord presence, and play/pause changes.
+- [x] Publish an accurate supported-sites list with platform requirements.
+- [x] Record a clearly labeled browser UI demo with simulated playback, artwork, controls, and FAQ.
+- [ ] Record end-to-end live site detection and actual Discord presence after manual verification.
 - [ ] Prepare a concise installation guide and troubleshooting screenshots.
 - [ ] Improve repository topics, release descriptions, and bug-report prompts for multi-site reports.
 - [ ] Draft announcements for relevant communities that permit project sharing.
@@ -101,11 +102,11 @@ Completion: someone unfamiliar with the project can understand its purpose, inst
 - [x] Create a public FAQ page for setup, supported sites, common connection problems, privacy, and V7 plans.
 - [x] Link the FAQ from the website navigation, support page, README, and this roadmap.
 
-Read the [Anime-RPC website FAQ](https://viesca272.github.io/AnimeKai-RPC/faq.html). It uses expandable written answers and works without JavaScript. V6.1.6 answers are separated from planned V7 features. This is the first help resource; the chat-style panel below remains a proposal.
+Read the [Anime-RPC website FAQ](https://viesca272.github.io/AnimeKai-RPC/faq.html). It uses expandable written answers and works without JavaScript. V6.1.6 answers are separated from the experimental V7 alpha. The extension also includes the local guided-help page described below.
 
-## Proposed V7 feature — Help chatbot
+## V7 alpha feature — Local guided help
 
-A small chat-style help panel would answer simple Anime-RPC questions and guide users through common setup problems. This is a roadmap proposal; placement and implementation approach still need to be finalized.
+A dedicated Help & FAQ page now answers simple Anime-RPC questions using bundled written answers. It is opened from the popup or setup page.
 
 Examples:
 - "How do I install the desktop helper?"
@@ -114,19 +115,19 @@ Examples:
 - "Which sites and browsers are supported?"
 - "How do I update or repair the extension?"
 
-Recommended first version: a local FAQ-based assistant with suggested questions and simple text matching. Answers would ship with the extension, work offline, and require no AI account, API key, or paid service. It should be described honestly as guided help, not a general-purpose AI chatbot.
+The first version uses suggested questions and simple text matching. Answers ship with the extension and require no AI account, API key, or paid service. It is guided help, not a general-purpose AI chatbot.
 
-- [ ] Decide whether the help panel lives in the popup or a dedicated help page.
-- [ ] Write short, version-specific answers based on the setup guide, supported-sites list, and troubleshooting documentation.
-- [ ] Add suggested questions and recognize common wording for the same issue.
-- [ ] Link to existing Refresh, Run health check, Repair App, and support instructions; leave actions under the user's control.
+- [x] Decide whether the help panel lives in the popup or a dedicated help page.
+- [x] Write short, version-specific answers based on the setup guide, supported-sites list, and troubleshooting documentation.
+- [x] Add suggested questions and recognize common wording for the same issue.
+- [x] Link to existing Refresh, Run health check, Repair App, and support instructions; leave actions under the user's control.
 - [ ] Optionally explain locally available health-check results when the user requests help, without automatically uploading diagnostics or chat text.
-- [ ] For unknown questions, say that no matching answer was found and offer documentation or the GitHub issue page.
+- [x] For unknown questions, say that no matching answer was found and offer documentation or the GitHub issue page.
 - [ ] Check keyboard access, answer accuracy, offline behavior, and unsupported-question handling.
 
 Completion: the help panel answers the documented common questions accurately, distinguishes planned features from released support, and directs unresolved problems to useful next steps.
 
-A cloud AI service is a separate future decision requiring a provider, cost plan, and data-handling design. It is not a dependency for the proposed first version.
+A cloud AI service is a separate future decision requiring a provider, cost plan, and data-handling design. It is not a dependency of this local version.
 
 ## Validation before V7 stable
 

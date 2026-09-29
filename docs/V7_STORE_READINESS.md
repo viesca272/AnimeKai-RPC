@@ -20,3 +20,5 @@ Scripts are packaged with the extension; no remote executable code or cloud chat
 Before submission: minimize/audit permissions against live behavior, decide per-site optional permissions, complete live testing, set production extension IDs/allowlists, check privacy disclosures, prepare accurate screenshots/listings, review third-party artwork rights, sign/distribute the Windows helper, and verify installation/rollback. Public availability of a logo does not establish redistribution rights or official affiliation.
 
 Artwork sources are recorded in `src/v7/artwork/sources.json`. The browsing files are 512×512 PNGs with padded content; playback badges are transparent 256×256 PNGs. This preparation is intended for Discord thumbnails. Actual remote fetches/crops and store rights review remain pending.
+
+The alpha manifest uses Chrome version `7.0.0.1` with display version `7.0.0-alpha.1`. Future published manifests must increase numerically (for example, stable `7.0.1`); `7.0.0` would be lower than this alpha.

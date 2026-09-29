@@ -2,6 +2,12 @@
 
 **Status: prerelease — still needs live checking.** Automated fixtures demonstrate specific behavior; they do not establish live support for a site.
 
+## Results from this run
+
+- 16 JavaScript checks and 12 Python helper tests passed locally and on the Windows runner.
+- [Windows VM run](https://github.com/viesca272/AnimeKai-RPC/actions/runs/36506137871): passed installation, upgrade, repair, registry, packaging, and compiled-helper Native Messaging checks. Discord was unavailable as expected.
+- Chromium UI recording checks cover playing/paused/seek display, three browsing covers, site opt-in, appearance changes, FAQ matching/fallback, escaped input, onboarding, and browser errors. Playback and Chrome APIs are simulated.
+
 ## Repeatable checks
 
 ```sh
@@ -42,3 +48,9 @@ No signed-in Discord account or interactive Windows desktop was available for th
 ## Presence policy
 
 Playing wins over buffering, paused, ended, waiting, and browsing. Equal-ranked tabs retain the previous selection before preferring the active tab. Frame media older than 20 seconds is discarded; the next poll normally marks an existing watch page as waiting. Closing/leaving all supported enabled tabs clears presence. Ending an episode shows Finished until navigation or another tab takes priority. Clear suppresses sharing until Refresh; the sharing toggle is persistent.
+
+## Reproduce the UI recording
+
+With Playwright, a Chromium executable, and ffmpeg available, run `node tools/demo-v7.cjs`. Optional environment variables: `CHROMIUM_EXECUTABLE`, `DEMO_OUTPUT`, and `DEMO_COVER` (a local sample cover file). Output is a labeled MP4 plus `ui-checks.json`; no demo code is included in the release extension. The demo uses a local HTTP server and blocks external browser requests.
+
+The recorded sample uses the Frieren poster at https://cdn.myanimelist.net/images/anime/1015/138006.jpg, downloaded solely as a demo fixture. It is not bundled with the extension. Site-artwork sources are recorded separately in `src/v7/artwork/sources.json`.
