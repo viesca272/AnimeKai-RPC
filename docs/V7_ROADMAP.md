@@ -92,6 +92,31 @@ Use the [existing store checklist](STORE_RELEASE_CHECKLIST.md) as a starting poi
 
 Completion: someone unfamiliar with the project can understand its purpose, install it, and find help. Announcement drafts are prepared before any outreach is sent.
 
+## Proposed V7 feature — Help chatbot
+
+A small chat-style help panel would answer simple Anime-RPC questions and guide users through common setup problems. This is a roadmap proposal; placement and implementation approach still need to be finalized.
+
+Examples:
+- "How do I install the desktop helper?"
+- "Why isn't my anime showing on Discord?"
+- "Why does the player say waiting?"
+- "Which sites and browsers are supported?"
+- "How do I update or repair the extension?"
+
+Recommended first version: a local FAQ-based assistant with suggested questions and simple text matching. Answers would ship with the extension, work offline, and require no AI account, API key, or paid service. It should be described honestly as guided help, not a general-purpose AI chatbot.
+
+- [ ] Decide whether the help panel lives in the popup or a dedicated help page.
+- [ ] Write short, version-specific answers based on the setup guide, supported-sites list, and troubleshooting documentation.
+- [ ] Add suggested questions and recognize common wording for the same issue.
+- [ ] Link to existing Refresh, Run health check, Repair App, and support instructions; leave actions under the user's control.
+- [ ] Optionally explain locally available health-check results when the user requests help, without automatically uploading diagnostics or chat text.
+- [ ] For unknown questions, say that no matching answer was found and offer documentation or the GitHub issue page.
+- [ ] Check keyboard access, answer accuracy, offline behavior, and unsupported-question handling.
+
+Completion: the help panel answers the documented common questions accurately, distinguishes planned features from released support, and directs unresolved problems to useful next steps.
+
+A cloud AI service is a separate future decision requiring a provider, cost plan, and data-handling design. It is not a dependency for the proposed first version.
+
 ## Validation before V7 stable
 
 Record the browser, site/domain, build, result, and any limitation for each check.
@@ -103,6 +128,7 @@ Record the browser, site/domain, build, result, and any limitation for each chec
 | Multiple tabs | Two sites open, two players active, playing versus paused tabs, closing the selected tab, and no repeated presence switching |
 | Permissions | Grant, deny, revoke, disabled site, embedded-frame access, and unrelated-page isolation |
 | Discord and helper | Discord closed/reopened, helper disconnect/reconnect, Refresh, health checks, and repair |
+| Help chatbot, if included | Common question wording, correct version/site answers, unknown questions, offline use, keyboard access, and no automatic uploads |
 | Distribution | Clean installation, V6 migration, uninstall, store extension IDs, working downloads, and public documentation links |
 
 A site becomes advertised as supported only after its playback checks pass. If access or playback cannot be verified, mark it pending and revisit the launch scope.
