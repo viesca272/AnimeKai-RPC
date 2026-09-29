@@ -287,6 +287,10 @@ V6 is structured for Chrome Web Store and Microsoft Edge Add-ons distribution. T
 
 Until the store listings are live, the GitHub V6 package uses the unpacked extension flow.
 
+## Frequently asked questions
+
+Read the [website FAQ](https://viesca272.github.io/AnimeKai-RPC/faq.html) for setup, supported sites, connection troubleshooting, privacy, and V7 plans.
+
 ## Found a bug or have an idea?
 
 Use the GitHub issue forms:

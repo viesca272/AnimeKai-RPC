@@ -92,6 +92,13 @@ Use the [existing store checklist](STORE_RELEASE_CHECKLIST.md) as a starting poi
 
 Completion: someone unfamiliar with the project can understand its purpose, install it, and find help. Announcement drafts are prepared before any outreach is sent.
 
+## Website FAQ — first help resource
+
+- [x] Create a public FAQ page for setup, supported sites, common connection problems, privacy, and V7 plans.
+- [x] Link the FAQ from the website navigation, support page, README, and this roadmap.
+
+Read the [Anime-RPC website FAQ](https://viesca272.github.io/AnimeKai-RPC/faq.html). It uses expandable written answers and works without JavaScript. V6.1.6 answers are separated from planned V7 features. This is the first help resource; the chat-style panel below remains a proposal.
+
 ## Proposed V7 feature — Help chatbot
 
 A small chat-style help panel would answer simple Anime-RPC questions and guide users through common setup problems. This is a roadmap proposal; placement and implementation approach still need to be finalized.

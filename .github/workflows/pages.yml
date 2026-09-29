@@ -11,6 +11,7 @@ on:
       - "site-config.js"
       - "privacy.html"
       - "support.html"
+      - "faq.html"
       - "changelog.html"
       - "404.html"
       - "assets/**"
